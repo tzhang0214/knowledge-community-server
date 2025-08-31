@@ -7,7 +7,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from src.database import get_db
-from src.models import ChatHistory, KnowledgeItem, KnowledgeCategory
+from src.models import ChatHistory, User, KnowledgeItem, KnowledgeCategory
 from src.schemas import ChatMessage, ChatResponse, ChatHistoryResponse
 from src.auth import get_current_active_user
 from src.ai_service import ai_service

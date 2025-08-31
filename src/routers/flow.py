@@ -5,7 +5,7 @@ from typing import List, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from src.database import get_db
-from src.models import FlowVersion, FlowModule
+from src.models import FlowVersion, FlowModule, User
 from src.schemas import (
     FlowVersionCreate, FlowVersionUpdate, FlowVersionResponse,
     FlowModuleCreate, FlowModuleUpdate, FlowModuleResponse

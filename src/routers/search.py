@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from src.database import get_db
-from src.models import KnowledgeItem, KnowledgeCategory, FlowModule, FlowVersion, SearchLog
+from src.models import KnowledgeItem, KnowledgeCategory, FlowModule, FlowVersion, SearchLog, User
 from src.schemas import SearchRequest, SearchResponse, SearchResult
 from src.auth import get_current_user, get_current_active_user
 from src.cache import get_cached_search_result, set_cached_search_result
