@@ -3,11 +3,17 @@
 """
 import sys
 import os
+import uuid
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.database import init_db, SessionLocal
 from src.models import User, KnowledgeCategory, KnowledgeItem, FlowVersion, FlowModule, FlowArchitecture, FlowArchitectureItem
 from src.auth import get_password_hash
+
+
+def generate_uuid():
+    """生成UUID"""
+    return str(uuid.uuid4())
 
 
 def create_sample_data():
@@ -17,6 +23,7 @@ def create_sample_data():
     try:
         # 创建管理员用户
         admin_user = User(
+            id=generate_uuid(),
             username="admin",
             email="admin@example.com",
             password_hash=get_password_hash("admin123"),
@@ -26,6 +33,7 @@ def create_sample_data():
         
         # 创建测试用户
         test_user = User(
+            id=generate_uuid(),
             username="testuser",
             email="test@example.com",
             password_hash=get_password_hash("test123"),
@@ -36,6 +44,7 @@ def create_sample_data():
         # 创建知识分类
         categories = [
             KnowledgeCategory(
+                id=generate_uuid(),
                 category_id="camera-imaging",
                 title="📷 相机成像原理",
                 icon="📷",
@@ -43,6 +52,7 @@ def create_sample_data():
                 sort_order=1
             ),
             KnowledgeCategory(
+                id=generate_uuid(),
                 category_id="isp-algorithms",
                 title="🔬 ISP处理算法",
                 icon="🔬",
@@ -50,6 +60,7 @@ def create_sample_data():
                 sort_order=2
             ),
             KnowledgeCategory(
+                id=generate_uuid(),
                 category_id="hardware-design",
                 title="⚡ 硬件设计",
                 icon="⚡",
@@ -57,6 +68,7 @@ def create_sample_data():
                 sort_order=3
             ),
             KnowledgeCategory(
+                id=generate_uuid(),
                 category_id="basic-concepts",
                 title="📚 基础知识",
                 icon="📚",
@@ -71,6 +83,7 @@ def create_sample_data():
         # 创建知识项
         knowledge_items = [
             KnowledgeItem(
+                id=generate_uuid(),
                 category_id="basic-concepts",
                 title="ISP基础概念",
                 description="图像信号处理器(ISP)的基本概念和作用",
@@ -79,6 +92,7 @@ def create_sample_data():
                 sort_order=1
             ),
             KnowledgeItem(
+                id=generate_uuid(),
                 category_id="camera-imaging",
                 title="光学系统",
                 description="镜头组、光圈、焦距等光学元件组成成像系统",
@@ -87,6 +101,7 @@ def create_sample_data():
                 sort_order=1
             ),
             KnowledgeItem(
+                id=generate_uuid(),
                 category_id="isp-algorithms",
                 title="去马赛克",
                 description="Demosaic算法从Bayer阵列重建全彩图像",
@@ -95,6 +110,7 @@ def create_sample_data():
                 sort_order=1
             ),
             KnowledgeItem(
+                id=generate_uuid(),
                 category_id="isp-algorithms",
                 title="降噪算法",
                 description="各种降噪算法及其实现原理",
@@ -103,6 +119,7 @@ def create_sample_data():
                 sort_order=2
             ),
             KnowledgeItem(
+                id=generate_uuid(),
                 category_id="hardware-design",
                 title="ISP芯片设计",
                 description="ISP专用芯片的架构设计",
@@ -118,12 +135,14 @@ def create_sample_data():
         # 创建架构图版本
         flow_versions = [
             FlowVersion(
+                id=generate_uuid(),
                 version_id="default",
                 title="标准版本",
                 description="标准ISP架构图",
                 is_default=True
             ),
             FlowVersion(
+                id=generate_uuid(),
                 version_id="advanced",
                 title="高级版本",
                 description="高级ISP架构图，包含更多模块",
@@ -137,6 +156,7 @@ def create_sample_data():
         # 创建架构图模块
         flow_modules = [
             FlowModule(
+                id=generate_uuid(),
                 version_id="default",
                 module_id="sensor",
                 title="图像传感器",
@@ -148,6 +168,7 @@ def create_sample_data():
                 position_y=100
             ),
             FlowModule(
+                id=generate_uuid(),
                 version_id="default",
                 module_id="mipi-receiver",
                 title="MIPI CSI-2接收器",
@@ -159,6 +180,7 @@ def create_sample_data():
                 position_y=100
             ),
             FlowModule(
+                id=generate_uuid(),
                 version_id="default",
                 module_id="isp-core",
                 title="ISP核心处理器",
@@ -170,6 +192,7 @@ def create_sample_data():
                 position_y=100
             ),
             FlowModule(
+                id=generate_uuid(),
                 version_id="default",
                 module_id="memory",
                 title="内存控制器",
@@ -188,33 +211,39 @@ def create_sample_data():
         # 创建架构图结构
         flow_architectures = [
             FlowArchitecture(
+                id=generate_uuid(),
                 domain="sensor",
                 title="传感器输入",
                 sort_order=1
             ),
             FlowArchitecture(
+                id=generate_uuid(),
                 domain="raw",
                 title="RAW域处理",
                 sort_order=2
             ),
             FlowArchitecture(
+                id=generate_uuid(),
                 domain="rgb",
                 title="RGB域处理",
                 sort_order=3
             ),
             FlowArchitecture(
+                id=generate_uuid(),
                 domain="yuv",
                 title="YUV域处理",
                 sort_order=4
             ),
             FlowArchitecture(
+                id=generate_uuid(),
                 domain="output",
-                title="输出",
+                title="输出处理",
                 sort_order=5
             ),
             FlowArchitecture(
+                id=generate_uuid(),
                 domain="memory",
-                title="内存子系统",
+                title="内存管理",
                 sort_order=6
             )
         ]
@@ -224,158 +253,120 @@ def create_sample_data():
         
         # 创建架构图模块项
         flow_architecture_items = [
-            # 传感器输入
             FlowArchitectureItem(
+                id=generate_uuid(),
                 domain="sensor",
-                item_id="mipi-receiver",
-                title="MIPI CSI-2接收器",
-                description="接收传感器数据",
+                item_id="cmos-sensor",
+                title="CMOS图像传感器",
+                description="CMOS图像传感器的工作原理和特性",
                 item_type="sensor",
                 sort_order=1
             ),
             FlowArchitectureItem(
+                id=generate_uuid(),
                 domain="sensor",
-                item_id="raw-data",
-                title="RAW12/14bit数据",
-                description="原始传感器数据",
+                item_id="ccd-sensor",
+                title="CCD图像传感器",
+                description="CCD图像传感器的工作原理和特性",
                 item_type="sensor",
                 sort_order=2
             ),
-            
-            # RAW域处理
             FlowArchitectureItem(
+                id=generate_uuid(),
                 domain="raw",
-                item_id="blc",
-                title="黑电平校正 BLC",
-                description="校正暗电流",
+                item_id="bayer-filter",
+                title="Bayer滤色镜",
+                description="Bayer滤色镜的颜色排列和原理",
                 item_type="raw",
                 sort_order=1
             ),
             FlowArchitectureItem(
+                id=generate_uuid(),
                 domain="raw",
-                item_id="lsc",
-                title="镜头阴影校正 LSC",
-                description="校正镜头阴影",
-                item_type="raw",
-                sort_order=2
-            ),
-            FlowArchitectureItem(
-                domain="raw",
-                item_id="dpc",
-                title="坏点校正 DPC",
-                description="检测修复坏点",
-                item_type="raw",
-                sort_order=3
-            ),
-            FlowArchitectureItem(
-                domain="raw",
-                item_id="hdr-fusion",
-                title="HDR融合引擎",
-                description="多帧融合",
-                item_type="raw",
-                sort_order=4
-            ),
-            
-            # RGB域处理
-            FlowArchitectureItem(
-                domain="rgb",
                 item_id="demosaic",
-                title="去马赛克 Demosaic",
-                description="色彩重建",
+                title="去马赛克算法",
+                description="从Bayer阵列重建全彩图像的算法",
+                item_type="raw",
+                sort_order=2
+            ),
+            FlowArchitectureItem(
+                id=generate_uuid(),
+                domain="rgb",
+                item_id="white-balance",
+                title="白平衡",
+                description="自动白平衡算法和实现",
                 item_type="rgb",
                 sort_order=1
             ),
             FlowArchitectureItem(
+                id=generate_uuid(),
                 domain="rgb",
-                item_id="awb",
-                title="自动白平衡 AWB",
-                description="色温校正",
+                item_id="color-correction",
+                title="色彩校正",
+                description="色彩空间转换和校正",
                 item_type="rgb",
                 sort_order=2
             ),
             FlowArchitectureItem(
-                domain="rgb",
-                item_id="ccm",
-                title="色彩校正矩阵 CCM",
-                description="色彩空间转换",
-                item_type="rgb",
-                sort_order=3
-            ),
-            FlowArchitectureItem(
-                domain="rgb",
-                item_id="gamma",
-                title="Gamma校正",
-                description="非线性校正",
-                item_type="rgb",
-                sort_order=4
-            ),
-            
-            # YUV域处理
-            FlowArchitectureItem(
-                domain="yuv",
-                item_id="rgb2yuv",
-                title="RGB→YUV转换",
-                description="色彩空间转换",
-                item_type="yuv",
-                sort_order=1
-            ),
-            FlowArchitectureItem(
+                id=generate_uuid(),
                 domain="yuv",
                 item_id="noise-reduction",
-                title="2D/3D降噪",
-                description="图像降噪",
+                title="降噪处理",
+                description="时域和空域降噪算法",
+                item_type="yuv",
+                sort_order=1
+            ),
+            FlowArchitectureItem(
+                id=generate_uuid(),
+                domain="yuv",
+                item_id="edge-enhancement",
+                title="边缘增强",
+                description="边缘检测和增强算法",
                 item_type="yuv",
                 sort_order=2
             ),
             FlowArchitectureItem(
-                domain="yuv",
-                item_id="sharpening",
-                title="图像锐化",
-                description="边缘增强",
-                item_type="yuv",
-                sort_order=3
-            ),
-            FlowArchitectureItem(
-                domain="yuv",
-                item_id="scale",
-                title="缩放 Scale",
-                description="分辨率调整",
-                item_type="yuv",
-                sort_order=4
-            ),
-            
-            # 输出
-            FlowArchitectureItem(
+                id=generate_uuid(),
                 domain="output",
-                item_id="mipi-transmitter",
-                title="MIPI CSI-2发射器",
-                description="输出图像数据",
+                item_id="gamma-correction",
+                title="伽马校正",
+                description="伽马校正和色调映射",
                 item_type="output",
                 sort_order=1
             ),
             FlowArchitectureItem(
+                id=generate_uuid(),
                 domain="output",
-                item_id="video-encoder",
-                title="视频编码器",
-                description="编码压缩",
+                item_id="format-conversion",
+                title="格式转换",
+                description="不同图像格式之间的转换",
                 item_type="output",
                 sort_order=2
             ),
-            
-            # 内存子系统
             FlowArchitectureItem(
+                id=generate_uuid(),
                 domain="memory",
                 item_id="ddr-controller",
                 title="DDR控制器",
-                description="内存访问控制",
+                description="DDR内存控制器和接口",
                 item_type="memory",
                 sort_order=1
+            ),
+            FlowArchitectureItem(
+                id=generate_uuid(),
+                domain="memory",
+                item_id="cache-management",
+                title="缓存管理",
+                description="多级缓存的管理策略",
+                item_type="memory",
+                sort_order=2
             )
         ]
         
         for item in flow_architecture_items:
             db.add(item)
         
+        # 提交所有更改
         db.commit()
         print("示例数据创建成功！")
         
@@ -391,22 +382,14 @@ def main():
     """主函数"""
     print("正在初始化数据库...")
     
-    try:
-        # 初始化数据库表
-        init_db()
-        print("数据库表创建成功！")
-        
-        # 创建示例数据
-        create_sample_data()
-        
-        print("数据库初始化完成！")
-        print("\n默认用户:")
-        print("管理员: admin / admin123")
-        print("测试用户: testuser / test123")
-        
-    except Exception as e:
-        print(f"数据库初始化失败: {e}")
-        sys.exit(1)
+    # 初始化数据库表结构
+    init_db()
+    print("数据库表结构创建完成！")
+    
+    # 创建示例数据
+    create_sample_data()
+    
+    print("数据库初始化完成！")
 
 
 if __name__ == "__main__":

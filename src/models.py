@@ -1,17 +1,24 @@
 """
 数据库模型定义
 """
+import uuid
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, ForeignKey, Index
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from src.database import Base
+
+
+def generate_uuid():
+    """生成UUID"""
+    return str(uuid.uuid4())
 
 
 class User(Base):
     """用户表"""
     __tablename__ = "users"
     
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String(36), primary_key=True, default=generate_uuid, index=True)
     username = Column(String(50), unique=True, index=True, nullable=False)
     email = Column(String(100), unique=True, index=True)
     password_hash = Column(String(255), nullable=False)
@@ -25,7 +32,7 @@ class KnowledgeCategory(Base):
     """知识分类表"""
     __tablename__ = "knowledge_categories"
     
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String(36), primary_key=True, default=generate_uuid, index=True)
     category_id = Column(String(100), unique=True, index=True, nullable=False)
     title = Column(String(200), nullable=False)
     icon = Column(String(50))
@@ -40,7 +47,7 @@ class KnowledgeItem(Base):
     """知识项表"""
     __tablename__ = "knowledge_items"
     
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String(36), primary_key=True, default=generate_uuid, index=True)
     category_id = Column(String(100), ForeignKey("knowledge_categories.category_id"), nullable=False)
     title = Column(String(200), nullable=False)
     description = Column(Text)
@@ -56,7 +63,7 @@ class FlowVersion(Base):
     """架构图版本表"""
     __tablename__ = "flow_versions"
     
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String(36), primary_key=True, default=generate_uuid, index=True)
     version_id = Column(String(100), unique=True, index=True, nullable=False)
     title = Column(String(200), nullable=False)
     description = Column(Text)
@@ -70,7 +77,7 @@ class FlowModule(Base):
     """架构图模块表"""
     __tablename__ = "flow_modules"
     
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String(36), primary_key=True, default=generate_uuid, index=True)
     version_id = Column(String(100), ForeignKey("flow_versions.version_id"), nullable=False)
     module_id = Column(String(100), nullable=False)
     title = Column(String(200), nullable=False)
@@ -90,7 +97,7 @@ class FlowArchitecture(Base):
     """架构图结构表"""
     __tablename__ = "flow_architectures"
     
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String(36), primary_key=True, default=generate_uuid, index=True)
     domain = Column(String(50), nullable=False)  # 'sensor', 'raw', 'rgb', 'yuv', 'output', 'memory'
     title = Column(String(200), nullable=False)
     sort_order = Column(Integer, default=0)
@@ -103,7 +110,7 @@ class FlowArchitectureItem(Base):
     """架构图模块项表"""
     __tablename__ = "flow_architecture_items"
     
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String(36), primary_key=True, default=generate_uuid, index=True)
     domain = Column(String(50), ForeignKey("flow_architectures.domain"), nullable=False)
     item_id = Column(String(100), nullable=False)
     title = Column(String(200), nullable=False)
@@ -119,8 +126,8 @@ class ChatHistory(Base):
     """聊天记录表"""
     __tablename__ = "chat_history"
     
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    id = Column(String(36), primary_key=True, default=generate_uuid, index=True)
+    user_id = Column(String(36), ForeignKey("users.id"))
     session_id = Column(String(100), nullable=False)
     message_type = Column(String(20), nullable=False)  # 'user' | 'assistant'
     content = Column(Text, nullable=False)
@@ -132,8 +139,8 @@ class SearchLog(Base):
     """搜索记录表"""
     __tablename__ = "search_logs"
     
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    id = Column(String(36), primary_key=True, default=generate_uuid, index=True)
+    user_id = Column(String(36), ForeignKey("users.id"))
     query = Column(String(500), nullable=False)
     result_count = Column(Integer)
     search_time_ms = Column(Integer)
