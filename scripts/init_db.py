@@ -6,7 +6,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.database import init_db, SessionLocal
-from src.models import User, KnowledgeCategory, KnowledgeItem, FlowVersion, FlowModule
+from src.models import User, KnowledgeCategory, KnowledgeItem, FlowVersion, FlowModule, FlowArchitecture, FlowArchitectureItem
 from src.auth import get_password_hash
 
 
@@ -184,6 +184,197 @@ def create_sample_data():
         
         for module in flow_modules:
             db.add(module)
+        
+        # 创建架构图结构
+        flow_architectures = [
+            FlowArchitecture(
+                domain="sensor",
+                title="传感器输入",
+                sort_order=1
+            ),
+            FlowArchitecture(
+                domain="raw",
+                title="RAW域处理",
+                sort_order=2
+            ),
+            FlowArchitecture(
+                domain="rgb",
+                title="RGB域处理",
+                sort_order=3
+            ),
+            FlowArchitecture(
+                domain="yuv",
+                title="YUV域处理",
+                sort_order=4
+            ),
+            FlowArchitecture(
+                domain="output",
+                title="输出",
+                sort_order=5
+            ),
+            FlowArchitecture(
+                domain="memory",
+                title="内存子系统",
+                sort_order=6
+            )
+        ]
+        
+        for architecture in flow_architectures:
+            db.add(architecture)
+        
+        # 创建架构图模块项
+        flow_architecture_items = [
+            # 传感器输入
+            FlowArchitectureItem(
+                domain="sensor",
+                item_id="mipi-receiver",
+                title="MIPI CSI-2接收器",
+                description="接收传感器数据",
+                item_type="sensor",
+                sort_order=1
+            ),
+            FlowArchitectureItem(
+                domain="sensor",
+                item_id="raw-data",
+                title="RAW12/14bit数据",
+                description="原始传感器数据",
+                item_type="sensor",
+                sort_order=2
+            ),
+            
+            # RAW域处理
+            FlowArchitectureItem(
+                domain="raw",
+                item_id="blc",
+                title="黑电平校正 BLC",
+                description="校正暗电流",
+                item_type="raw",
+                sort_order=1
+            ),
+            FlowArchitectureItem(
+                domain="raw",
+                item_id="lsc",
+                title="镜头阴影校正 LSC",
+                description="校正镜头阴影",
+                item_type="raw",
+                sort_order=2
+            ),
+            FlowArchitectureItem(
+                domain="raw",
+                item_id="dpc",
+                title="坏点校正 DPC",
+                description="检测修复坏点",
+                item_type="raw",
+                sort_order=3
+            ),
+            FlowArchitectureItem(
+                domain="raw",
+                item_id="hdr-fusion",
+                title="HDR融合引擎",
+                description="多帧融合",
+                item_type="raw",
+                sort_order=4
+            ),
+            
+            # RGB域处理
+            FlowArchitectureItem(
+                domain="rgb",
+                item_id="demosaic",
+                title="去马赛克 Demosaic",
+                description="色彩重建",
+                item_type="rgb",
+                sort_order=1
+            ),
+            FlowArchitectureItem(
+                domain="rgb",
+                item_id="awb",
+                title="自动白平衡 AWB",
+                description="色温校正",
+                item_type="rgb",
+                sort_order=2
+            ),
+            FlowArchitectureItem(
+                domain="rgb",
+                item_id="ccm",
+                title="色彩校正矩阵 CCM",
+                description="色彩空间转换",
+                item_type="rgb",
+                sort_order=3
+            ),
+            FlowArchitectureItem(
+                domain="rgb",
+                item_id="gamma",
+                title="Gamma校正",
+                description="非线性校正",
+                item_type="rgb",
+                sort_order=4
+            ),
+            
+            # YUV域处理
+            FlowArchitectureItem(
+                domain="yuv",
+                item_id="rgb2yuv",
+                title="RGB→YUV转换",
+                description="色彩空间转换",
+                item_type="yuv",
+                sort_order=1
+            ),
+            FlowArchitectureItem(
+                domain="yuv",
+                item_id="noise-reduction",
+                title="2D/3D降噪",
+                description="图像降噪",
+                item_type="yuv",
+                sort_order=2
+            ),
+            FlowArchitectureItem(
+                domain="yuv",
+                item_id="sharpening",
+                title="图像锐化",
+                description="边缘增强",
+                item_type="yuv",
+                sort_order=3
+            ),
+            FlowArchitectureItem(
+                domain="yuv",
+                item_id="scale",
+                title="缩放 Scale",
+                description="分辨率调整",
+                item_type="yuv",
+                sort_order=4
+            ),
+            
+            # 输出
+            FlowArchitectureItem(
+                domain="output",
+                item_id="mipi-transmitter",
+                title="MIPI CSI-2发射器",
+                description="输出图像数据",
+                item_type="output",
+                sort_order=1
+            ),
+            FlowArchitectureItem(
+                domain="output",
+                item_id="video-encoder",
+                title="视频编码器",
+                description="编码压缩",
+                item_type="output",
+                sort_order=2
+            ),
+            
+            # 内存子系统
+            FlowArchitectureItem(
+                domain="memory",
+                item_id="ddr-controller",
+                title="DDR控制器",
+                description="内存访问控制",
+                item_type="memory",
+                sort_order=1
+            )
+        ]
+        
+        for item in flow_architecture_items:
+            db.add(item)
         
         db.commit()
         print("示例数据创建成功！")

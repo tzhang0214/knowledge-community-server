@@ -86,6 +86,35 @@ class FlowModule(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
 
+class FlowArchitecture(Base):
+    """架构图结构表"""
+    __tablename__ = "flow_architectures"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    domain = Column(String(50), nullable=False)  # 'sensor', 'raw', 'rgb', 'yuv', 'output', 'memory'
+    title = Column(String(200), nullable=False)
+    sort_order = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class FlowArchitectureItem(Base):
+    """架构图模块项表"""
+    __tablename__ = "flow_architecture_items"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    domain = Column(String(50), ForeignKey("flow_architectures.domain"), nullable=False)
+    item_id = Column(String(100), nullable=False)
+    title = Column(String(200), nullable=False)
+    description = Column(Text)
+    item_type = Column(String(50), nullable=False)  # 'sensor', 'raw', 'rgb', 'yuv', 'output', 'memory'
+    sort_order = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
 class ChatHistory(Base):
     """聊天记录表"""
     __tablename__ = "chat_history"

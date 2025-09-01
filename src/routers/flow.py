@@ -5,7 +5,7 @@ from typing import List, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from src.database import get_db
-from src.models import FlowVersion, FlowModule, User
+from src.models import FlowVersion, FlowModule, User, FlowArchitecture, FlowArchitectureItem
 from src.schemas import (
     FlowVersionCreate, FlowVersionUpdate, FlowVersionResponse,
     FlowModuleCreate, FlowModuleUpdate, FlowModuleResponse
@@ -20,16 +20,35 @@ from src.cache import (
 router = APIRouter(prefix="/flow", tags=["架构图"])
 
 
-@router.get("/versions", response_model=Dict[str, str])
+@router.get("/versions", response_model=Dict[str, Any])
 async def get_flow_versions(db: Session = Depends(get_db)):
-    """获取所有版本"""
-    versions = db.query(FlowVersion).filter(
-        FlowVersion.is_active == True
-    ).all()
+    """获取架构图版本信息"""
+    # 从数据库查询架构图结构
+    architectures = db.query(FlowArchitecture).filter(
+        FlowArchitecture.is_active == True
+    ).order_by(FlowArchitecture.sort_order).all()
     
     result = {}
-    for version in versions:
-        result[version.version_id] = version.title
+    
+    for architecture in architectures:
+        # 查询该域下的所有模块项
+        items = db.query(FlowArchitectureItem).filter(
+            FlowArchitectureItem.domain == architecture.domain,
+            FlowArchitectureItem.is_active == True
+        ).order_by(FlowArchitectureItem.sort_order).all()
+        
+        result[architecture.domain] = {
+            "title": architecture.title,
+            "items": [
+                {
+                    "id": item.item_id,
+                    "title": item.title,
+                    "description": item.description,
+                    "type": item.item_type
+                }
+                for item in items
+            ]
+        }
     
     return result
 

@@ -41,12 +41,12 @@ async def get_knowledge_categories(db: Session = Depends(get_db)):
         ).order_by(KnowledgeItem.sort_order).all()
         
         result[category.category_id] = {
-            "tit le": category.title,
+            "title": category.title,
             "items": [
                 {
                     "title": item.title,
                     "description": item.description,
-                    "status": item.status···    
+                    "status": item.status
                 }
                 for item in items
             ]
