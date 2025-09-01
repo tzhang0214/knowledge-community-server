@@ -1,16 +1,13 @@
 """
-知识库管理路由
+知识库相关路由
 """
 from typing import List, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import and_
 from src.database import get_db
-from src.models import KnowledgeCategory, KnowledgeItem, User
-from src.schemas import (
-    KnowledgeCategoryCreate, KnowledgeCategoryUpdate, KnowledgeCategoryResponse,
-    KnowledgeItemCreate, KnowledgeItemUpdate, KnowledgeItemResponse
-)
-from src.auth import get_current_admin_user, get_current_user
+from src.models import KnowledgeCategory, KnowledgeItem
+from src.schemas import KnowledgeItemCreate, KnowledgeItemUpdate
 from src.cache import (
     get_cached_knowledge_categories, set_cached_knowledge_categories,
     get_cached_knowledge_item, set_cached_knowledge_item,
@@ -20,261 +17,227 @@ from src.cache import (
 router = APIRouter(prefix="/knowledge", tags=["知识库"])
 
 
-@router.get("/categories", response_model=Dict[str, Any])
+@router.get("/categories")
 async def get_knowledge_categories(db: Session = Depends(get_db)):
-    """获取所有知识分类"""
+    """获取知识分类列表"""
     # 尝试从缓存获取
     cached_data = get_cached_knowledge_categories()
     if cached_data:
         return cached_data
     
-    # 从数据库获取
-    categories = db.query(KnowledgeCategory).filter(
-        KnowledgeCategory.is_active == True
-    ).order_by(KnowledgeCategory.sort_order).all()
-    
-    result = {}
-    for category in categories:
-        # 获取分类下的知识项
-        items = db.query(KnowledgeItem).filter(
-            KnowledgeItem.category_id == category.category_id
-        ).order_by(KnowledgeItem.sort_order).all()
+    try:
+        # 查询所有活跃的分类
+        categories = db.query(KnowledgeCategory).filter(
+            KnowledgeCategory.is_active == True
+        ).order_by(KnowledgeCategory.sort_order).all()
         
-        result[category.category_id] = {
-            "title": category.title,
-            "items": [
-                {
+        # 构建返回数据结构
+        result = {}
+        for category in categories:
+            # 查询该分类下的知识项
+            items = db.query(KnowledgeItem).filter(
+                KnowledgeItem.category_id == category.category_id
+            ).order_by(KnowledgeItem.sort_order).all()
+            
+            # 构建知识项列表
+            item_list = []
+            for item in items:
+                item_list.append({
+                    "itemId": item.id,  # 使用UUID格式的id
                     "title": item.title,
                     "description": item.description,
                     "status": item.status
-                }
-                for item in items
-            ]
-        }
-    
-    # 缓存结果
-    set_cached_knowledge_categories(result)
-    
-    return result
+                })
+            
+            result[category.category_id] = {
+                "title": category.title,
+                "items": item_list
+            }
+        
+        # 设置缓存
+        set_cached_knowledge_categories(result)
+        return result
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"获取知识分类失败: {str(e)}")
 
 
-@router.get("/category/{category_id}", response_model=KnowledgeCategoryResponse)
-async def get_knowledge_category(category_id: str, db: Session = Depends(get_db)):
-    """获取指定分类详情"""
-    category = db.query(KnowledgeCategory).filter(
-        KnowledgeCategory.category_id == category_id,
-        KnowledgeCategory.is_active == True
-    ).first()
-    
-    if not category:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="分类不存在"
-        )
-    
-    return KnowledgeCategoryResponse.from_orm(category)
-
-
-@router.get("/item/{item_id}", response_model=KnowledgeItemResponse)
-async def get_knowledge_item(item_id: int, db: Session = Depends(get_db)):
-    """获取指定知识项详情"""
+@router.get("/item/{item_id}")
+async def get_knowledge_item(item_id: str, db: Session = Depends(get_db)):
+    """根据ID获取知识项详情"""
     # 尝试从缓存获取
     cached_data = get_cached_knowledge_item(item_id)
     if cached_data:
         return cached_data
     
-    item = db.query(KnowledgeItem).filter(KnowledgeItem.id == item_id).first()
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="知识项不存在"
-        )
-    
-    result = KnowledgeItemResponse.from_orm(item)
-    
-    # 缓存结果
-    set_cached_knowledge_item(item_id, result.dict())
-    
-    return result
+    try:
+        # 查询知识项
+        item = db.query(KnowledgeItem).filter(KnowledgeItem.id == item_id).first()
+        if not item:
+            raise HTTPException(status_code=404, detail="知识项不存在")
+        
+        # 构建返回数据
+        result = {
+            "category_id": item.category_id,
+            "title": item.title,
+            "description": item.description,
+            "status": item.status,
+            "content": item.content,
+            "external_link": item.external_link,
+            "sort_order": item.sort_order,
+            "id": item.id,  # 使用UUID格式的id
+            "created_at": item.created_at.isoformat() if item.created_at else None,
+            "updated_at": item.updated_at.isoformat() if item.updated_at else None
+        }
+        
+        # 设置缓存
+        set_cached_knowledge_item(item_id, result)
+        return result
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"获取知识项失败: {str(e)}")
 
 
-@router.post("/categories", response_model=KnowledgeCategoryResponse)
-async def create_knowledge_category(
-    category_data: KnowledgeCategoryCreate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
-):
-    """创建知识分类（管理员）"""
-    # 检查分类ID是否已存在
-    existing_category = db.query(KnowledgeCategory).filter(
-        KnowledgeCategory.category_id == category_data.category_id
-    ).first()
-    
-    if existing_category:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="分类ID已存在"
-        )
-    
-    db_category = KnowledgeCategory(**category_data.dict())
-    db.add(db_category)
-    db.commit()
-    db.refresh(db_category)
-    
-    # 清除缓存
-    clear_knowledge_cache()
-    
-    return KnowledgeCategoryResponse.from_orm(db_category)
-
-
-@router.put("/categories/{category_id}", response_model=KnowledgeCategoryResponse)
-async def update_knowledge_category(
-    category_id: str,
-    category_data: KnowledgeCategoryUpdate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
-):
-    """更新知识分类（管理员）"""
-    category = db.query(KnowledgeCategory).filter(
-        KnowledgeCategory.category_id == category_id
-    ).first()
-    
-    if not category:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="分类不存在"
-        )
-    
-    # 更新字段
-    update_data = category_data.dict(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(category, field, value)
-    
-    db.commit()
-    db.refresh(category)
-    
-    # 清除缓存
-    clear_knowledge_cache()
-    
-    return KnowledgeCategoryResponse.from_orm(category)
-
-
-@router.delete("/categories/{category_id}")
-async def delete_knowledge_category(
-    category_id: str,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
-):
-    """删除知识分类（管理员）"""
-    category = db.query(KnowledgeCategory).filter(
-        KnowledgeCategory.category_id == category_id
-    ).first()
-    
-    if not category:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="分类不存在"
-        )
-    
-    # 检查是否有知识项
-    items_count = db.query(KnowledgeItem).filter(
-        KnowledgeItem.category_id == category_id
-    ).count()
-    
-    if items_count > 0:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="分类下还有知识项，无法删除"
-        )
-    
-    db.delete(category)
-    db.commit()
-    
-    # 清除缓存
-    clear_knowledge_cache()
-    
-    return {"message": "分类删除成功"}
-
-
-@router.post("/items", response_model=KnowledgeItemResponse)
+@router.post("/item")
 async def create_knowledge_item(
-    item_data: KnowledgeItemCreate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    item: KnowledgeItemCreate, 
+    db: Session = Depends(get_db)
 ):
-    """创建知识项（管理员）"""
-    # 检查分类是否存在
-    category = db.query(KnowledgeCategory).filter(
-        KnowledgeCategory.category_id == item_data.category_id,
-        KnowledgeCategory.is_active == True
-    ).first()
-    
-    if not category:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="分类不存在"
-        )
-    
-    db_item = KnowledgeItem(**item_data.dict())
-    db.add(db_item)
-    db.commit()
-    db.refresh(db_item)
-    
-    # 清除缓存
-    clear_knowledge_cache()
-    
-    return KnowledgeItemResponse.from_orm(db_item)
+    """创建知识项"""
+    try:
+        # 验证分类是否存在
+        category = db.query(KnowledgeCategory).filter(
+            KnowledgeCategory.category_id == item.category_id
+        ).first()
+        if not category:
+            raise HTTPException(status_code=400, detail="指定的分类不存在")
+        
+        # 创建知识项
+        db_item = KnowledgeItem(**item.dict())
+        db.add(db_item)
+        db.commit()
+        db.refresh(db_item)
+        
+        # 清除相关缓存
+        clear_knowledge_cache()
+        
+        return {
+            "message": "知识项创建成功",
+            "item_id": db_item.id  # 返回UUID格式的id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"创建知识项失败: {str(e)}")
 
 
-@router.put("/items/{item_id}", response_model=KnowledgeItemResponse)
+@router.put("/item/{item_id}")
 async def update_knowledge_item(
-    item_id: int,
-    item_data: KnowledgeItemUpdate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    item_id: str,
+    item: KnowledgeItemUpdate, 
+    db: Session = Depends(get_db)
 ):
-    """更新知识项（管理员）"""
-    item = db.query(KnowledgeItem).filter(KnowledgeItem.id == item_id).first()
-    
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="知识项不存在"
-        )
-    
-    # 更新字段
-    update_data = item_data.dict(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(item, field, value)
-    
-    db.commit()
-    db.refresh(item)
-    
-    # 清除缓存
-    clear_knowledge_cache()
-    
-    return KnowledgeItemResponse.from_orm(item)
+    """更新知识项"""
+    try:
+        # 查询知识项
+        db_item = db.query(KnowledgeItem).filter(KnowledgeItem.id == item_id).first()
+        if not db_item:
+            raise HTTPException(status_code=404, detail="知识项不存在")
+        
+        # 更新字段
+        update_data = item.dict(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(db_item, field, value)
+        
+        db.commit()
+        db.refresh(db_item)
+        
+        # 清除相关缓存
+        clear_knowledge_cache()
+        
+        return {"message": "知识项更新成功"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"更新知识项失败: {str(e)}")
 
 
-@router.delete("/items/{item_id}")
-async def delete_knowledge_item(
-    item_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+@router.delete("/item/{item_id}")
+async def delete_knowledge_item(item_id: str, db: Session = Depends(get_db)):
+    """删除知识项"""
+    try:
+        # 查询知识项
+        db_item = db.query(KnowledgeItem).filter(KnowledgeItem.id == item_id).first()
+        if not db_item:
+            raise HTTPException(status_code=404, detail="知识项不存在")
+        
+        # 删除知识项
+        db.delete(db_item)
+        db.commit()
+        
+        # 清除相关缓存
+        clear_knowledge_cache()
+        
+        return {"message": "知识项删除成功"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"删除知识项失败: {str(e)}")
+
+
+@router.get("/search")
+async def search_knowledge(
+    q: str = Query(..., description="搜索关键词"),
+    category_id: str = Query(None, description="分类ID"),
+    status: str = Query(None, description="状态筛选"),
+    db: Session = Depends(get_db)
 ):
-    """删除知识项（管理员）"""
-    item = db.query(KnowledgeItem).filter(KnowledgeItem.id == item_id).first()
-    
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="知识项不存在"
-        )
-    
-    db.delete(item)
-    db.commit()
-    
-    # 清除缓存
-    clear_knowledge_cache()
-    
-    return {"message": "知识项删除成功"}
+    """搜索知识项"""
+    try:
+        # 构建查询条件
+        query = db.query(KnowledgeItem)
+        
+        # 关键词搜索
+        if q:
+            query = query.filter(
+                and_(
+                    KnowledgeItem.title.contains(q),
+                    KnowledgeItem.description.contains(q)
+                )
+            )
+        
+        # 分类筛选
+        if category_id:
+            query = query.filter(KnowledgeItem.category_id == category_id)
+        
+        # 状态筛选
+        if status:
+            query = query.filter(KnowledgeItem.status == status)
+        
+        # 执行查询
+        items = query.order_by(KnowledgeItem.sort_order).all()
+        
+        # 构建返回数据
+        result = []
+        for item in items:
+            result.append({
+                "id": item.id,  # 使用UUID格式的id
+                "category_id": item.category_id,
+                "title": item.title,
+                "description": item.description,
+                "status": item.status,
+                "sort_order": item.sort_order
+            })
+        
+        return {"items": result, "total": len(result)}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"搜索失败: {str(e)}")
