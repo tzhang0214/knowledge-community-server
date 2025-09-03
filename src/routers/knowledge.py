@@ -43,7 +43,7 @@ async def get_knowledge_categories(db: Session = Depends(get_db)):
             item_list = []
             for item in items:
                 item_list.append({
-                    "itemId": item.id,  # 使用UUID格式的id
+                    "id": item.id,  # 使用UUID格式的id
                     "title": item.title,
                     "description": item.description,
                     "status": item.status
