@@ -45,9 +45,12 @@ class AuthMiddleware(BaseHTTPMiddleware):
         # 验证token
         try:
             user_info = verify_token(token)
+            if not user_info:
+                return self._unauthorized_response("无效的认证token")
+            
             # 将用户信息添加到请求状态中，供后续使用
             request.state.user = user_info
-            logger.debug(f"用户 {user_info.get('username')} 认证成功")
+            logger.debug(f"用户 {user_info.get('sub')} 认证成功")
         except Exception as e:
             logger.warning(f"Token验证失败: {e}")
             return self._unauthorized_response("无效的认证token")
@@ -73,7 +76,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
     
     def _extract_token(self, request: Request) -> str:
         """从请求中提取token"""
-        # 优先从Authorization头获取
+        # 优先从Authorization头获取 
         auth_header = request.headers.get("Authorization")
         if auth_header and auth_header.startswith("Bearer "):
             return auth_header[7:]  # 移除"Bearer "前缀
