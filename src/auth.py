@@ -3,7 +3,7 @@
 """
 from datetime import datetime, timedelta
 from typing import Optional
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -69,13 +69,13 @@ def get_current_user(
         payload = verify_token(credentials.credentials)
         if payload is None:
             raise credentials_exception
-        username: str = payload.get("sub")
-        if username is None:
+        user_id: str = payload.get("sub")
+        if user_id is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
     
-    user = db.query(User).filter(User.username == username).first()
+    user = db.query(User).filter(User.id == user_id).first()
     if user is None:
         raise credentials_exception
     
@@ -98,19 +98,36 @@ def get_current_active_user(current_user: User = Depends(get_current_user)) -> U
     return current_user
 
 
-def get_current_admin_user(current_user: User = Depends(get_current_user)) -> User:
+def get_current_admin_user(request: Request) -> User:
     """获取当前管理员用户"""
-    if current_user.role != "admin":
+    if not hasattr(request.state, 'user'):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated"
+        )
+    
+    user_info = request.state.user
+    if user_info.get('role') != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions"
         )
-    return current_user
+    
+    # 从数据库获取完整用户信息
+    db = next(get_db())
+    user = db.query(User).filter(User.id == user_info['id']).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    return user
 
 
-def authenticate_user(db: Session, username: str, password: str) -> Optional[User]:
+def authenticate_user(db: Session, user_id: str, password: str) -> Optional[User]:
     """用户认证"""
-    user = db.query(User).filter(User.username == username).first()
+    user = db.query(User).filter(User.id == user_id).first()
     if not user:
         return None
     if not verify_password(password, user.password_hash):

@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from src.database import get_db
-from src.models import KnowledgeCategory, KnowledgeItem
+from src.models import KnowledgeCategory, KnowledgeItem, User
 from src.schemas import KnowledgeItemCreate, KnowledgeItemUpdate
 from src.cache import (
     get_cached_knowledge_categories, set_cached_knowledge_categories,
@@ -18,7 +18,9 @@ router = APIRouter(prefix="/knowledge", tags=["知识库"])
 
 
 @router.get("/categories")
-async def get_knowledge_categories(db: Session = Depends(get_db)):
+async def get_knowledge_categories(
+    db: Session = Depends(get_db)
+):
     """获取知识分类列表"""
     # 尝试从缓存获取
     cached_data = get_cached_knowledge_categories()
@@ -63,7 +65,10 @@ async def get_knowledge_categories(db: Session = Depends(get_db)):
 
 
 @router.get("/item/{item_id}")
-async def get_knowledge_item(item_id: str, db: Session = Depends(get_db)):
+async def get_knowledge_item(
+    item_id: str, 
+    db: Session = Depends(get_db)
+):
     """根据ID获取知识项详情"""
     # 尝试从缓存获取
     cached_data = get_cached_knowledge_item(item_id)
@@ -169,7 +174,10 @@ async def update_knowledge_item(
 
 
 @router.delete("/item/{item_id}")
-async def delete_knowledge_item(item_id: str, db: Session = Depends(get_db)):
+async def delete_knowledge_item(
+    item_id: str, 
+    db: Session = Depends(get_db)
+):
     """删除知识项"""
     try:
         # 查询知识项

@@ -54,7 +54,7 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
     db.refresh(db_user)
     
     # 生成访问令牌
-    access_token = create_access_token(data={"sub": db_user.username})
+    access_token = create_access_token(data={"sub": db_user.id})
     
     return TokenResponse(
         access_token=access_token,
@@ -66,11 +66,11 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
 @router.post("/login", response_model=TokenResponse)
 async def login(user_data: UserLogin, db: Session = Depends(get_db)):
     """用户登录"""
-    user = authenticate_user(db, user_data.username, user_data.password)
+    user = authenticate_user(db, user_data.id, user_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="用户名或密码错误",
+            detail="工号或密码错误",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
@@ -81,7 +81,7 @@ async def login(user_data: UserLogin, db: Session = Depends(get_db)):
         )
     
     # 生成访问令牌
-    access_token = create_access_token(data={"sub": user.username})
+    access_token = create_access_token(data={"sub": user.id})
     
     return TokenResponse(
         access_token=access_token,

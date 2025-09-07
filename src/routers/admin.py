@@ -2,7 +2,7 @@
 管理员相关路由
 """
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta
@@ -17,12 +17,13 @@ router = APIRouter(prefix="/admin", tags=["管理"])
 
 @router.get("/users", response_model=List[UserResponse])
 async def get_users(
+    request: Request,
     skip: int = Query(default=0, ge=0, description="跳过数量"),
     limit: int = Query(default=100, ge=1, le=1000, description="返回数量"),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    db: Session = Depends(get_db)
 ):
     """获取用户列表（管理员）"""
+    current_user = get_current_admin_user(request)
     users = db.query(User).offset(skip).limit(limit).all()
     return [UserResponse.from_orm(user) for user in users]
 
@@ -30,10 +31,11 @@ async def get_users(
 @router.post("/users", response_model=UserResponse)
 async def create_user(
     user_data: UserCreate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    request: Request,
+    db: Session = Depends(get_db)
 ):
     """创建用户（管理员）"""
+    current_user = get_current_admin_user(request)
     # 检查工号是否已存在
     existing_id = db.query(User).filter(User.id == user_data.id).first()
     if existing_id:
@@ -80,10 +82,11 @@ async def create_user(
 async def update_user(
     user_id: str,
     user_data: dict,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    request: Request,
+    db: Session = Depends(get_db)
 ):
     """更新用户（管理员）"""
+    current_user = get_current_admin_user(request)
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(
@@ -105,10 +108,11 @@ async def update_user(
 @router.delete("/users/{user_id}")
 async def delete_user(
     user_id: str,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    request: Request,
+    db: Session = Depends(get_db)
 ):
     """删除用户（管理员）"""
+    current_user = get_current_admin_user(request)
     if user_id == current_user.id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -130,10 +134,11 @@ async def delete_user(
 
 @router.get("/stats", response_model=SystemStats)
 async def get_system_stats(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    request: Request,
+    db: Session = Depends(get_db)
 ):
     """获取系统统计信息（管理员）"""
+    current_user = get_current_admin_user(request)
     # 总用户数
     total_users = db.query(User).count()
     
@@ -163,11 +168,12 @@ async def get_system_stats(
 
 @router.get("/stats/daily")
 async def get_daily_stats(
+    request: Request,
     days: int = Query(default=7, ge=1, le=30, description="天数"),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    db: Session = Depends(get_db)
 ):
     """获取每日统计信息（管理员）"""
+    current_user = get_current_admin_user(request)
     stats = []
     
     for i in range(days):
@@ -198,10 +204,12 @@ async def get_daily_stats(
 
 @router.post("/cache/clear")
 async def clear_cache(
+    request: Request,
     cache_type: str = Query(..., pattern="^(knowledge|flow|search|chat|all)$", description="缓存类型"),
-    current_user: User = Depends(get_current_admin_user)
+    db: Session = Depends(get_db)
 ):
     """清除缓存（管理员）"""
+    current_user = get_current_admin_user(request)
     if cache_type == "all":
         clear_all_cache()
         message = "所有缓存已清除"
@@ -227,12 +235,13 @@ async def clear_cache(
 
 @router.get("/logs/chat")
 async def get_chat_logs(
+    request: Request,
     skip: int = Query(default=0, ge=0, description="跳过数量"),
     limit: int = Query(default=100, ge=1, le=1000, description="返回数量"),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    db: Session = Depends(get_db)
 ):
     """获取聊天日志（管理员）"""
+    current_user = get_current_admin_user(request)
     logs = db.query(ChatHistory).join(User).order_by(
         ChatHistory.created_at.desc()
     ).offset(skip).limit(limit).all()

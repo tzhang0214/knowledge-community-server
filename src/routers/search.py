@@ -9,7 +9,6 @@ from sqlalchemy import or_
 from src.database import get_db
 from src.models import KnowledgeItem, KnowledgeCategory, User
 from src.schemas import SearchRequest, SearchResponse, SearchResult
-from src.auth import get_current_user, get_current_active_user
 from src.cache import get_cached_search_result, set_cached_search_result
 from src.ai_service import ai_service
 
@@ -20,8 +19,7 @@ router = APIRouter(prefix="/search", tags=["搜索"])
 async def search(
     q: str = Query(..., min_length=1, description="搜索关键词"),
     limit: int = Query(default=10, ge=1, le=100, description="结果数量限制"),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    db: Session = Depends(get_db)
 ):
     """搜索知识库内容"""
     start_time = time.time()
@@ -126,12 +124,11 @@ def calculate_relevance(item, query: str) -> float:
 async def enhanced_search(
     q: str = Query(..., min_length=1, description="搜索关键词"),
     limit: int = Query(default=10, ge=1, le=100, description="结果数量限制"),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    db: Session = Depends(get_db)
 ):
     """AI增强搜索"""
     # 先执行基础搜索
-    basic_results = await search(q, limit, db, current_user)
+    basic_results = await search(q, limit, db)
     
     # 使用AI增强搜索结果
     if basic_results.results:

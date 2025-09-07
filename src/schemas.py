@@ -29,7 +29,7 @@ class UserCreate(UserBase):
 
 class UserLogin(BaseModel):
     """用户登录模型"""
-    username: str
+    id: str = Field(..., min_length=1, max_length=36, description="用户工号")
     password: str
 
 

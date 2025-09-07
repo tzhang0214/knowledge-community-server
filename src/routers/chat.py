@@ -4,12 +4,11 @@
 import time
 import uuid
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 from src.database import get_db
 from src.models import ChatHistory, User, KnowledgeItem, KnowledgeCategory
 from src.schemas import ChatMessage, ChatResponse, ChatHistoryResponse
-from src.auth import get_current_active_user
 from src.ai_service import ai_service
 from src.cache import get_cached_chat_session, set_cached_chat_session
 
@@ -19,17 +18,21 @@ router = APIRouter(prefix="/chat", tags=["聊天"])
 @router.post("/message", response_model=ChatResponse)
 async def send_chat_message(
     message_data: ChatMessage,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    request: Request,
+    db: Session = Depends(get_db)
 ):
     """发送聊天消息"""
+    # 从中间件获取用户信息
+    user_info = request.state.user
+    current_user_id = user_info['id']
+    
     start_time = time.time()
     
     # 生成或使用会话ID
     session_id = message_data.session_id or str(uuid.uuid4())
     
     # 获取聊天历史
-    chat_history = get_chat_history_for_session(db, session_id, current_user.id)
+    chat_history = get_chat_history_for_session(db, session_id, current_user_id)
     
     # 构建知识上下文
     knowledge_context = build_knowledge_context(db, message_data.message)
@@ -49,7 +52,7 @@ async def send_chat_message(
     
     # 保存用户消息
     user_message = ChatHistory(
-        user_id=current_user.id,
+        user_id=current_user_id,
         session_id=session_id,
         message_type="user",
         content=message_data.message
@@ -58,7 +61,7 @@ async def send_chat_message(
     
     # 保存AI回复
     ai_message = ChatHistory(
-        user_id=current_user.id,
+        user_id=current_user_id,
         session_id=session_id,
         message_type="assistant",
         content=ai_response["response"],
@@ -78,7 +81,7 @@ async def send_chat_message(
     
     # 缓存会话
     set_cached_chat_session(session_id, {
-        "user_id": current_user.id,
+        "user_id": current_user_id,
         "last_message": message_data.message,
         "last_response": ai_response["response"]
     })
@@ -88,13 +91,17 @@ async def send_chat_message(
 
 @router.get("/history", response_model=List[ChatHistoryResponse])
 async def get_chat_history(
+    request: Request,
     session_id: Optional[str] = Query(None, description="会话ID"),
     limit: int = Query(default=50, ge=1, le=200, description="消息数量限制"),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    db: Session = Depends(get_db)
 ):
     """获取聊天历史"""
-    query = db.query(ChatHistory).filter(ChatHistory.user_id == current_user.id)
+    # 从中间件获取用户信息
+    user_info = request.state.user
+    current_user_id = user_info['id']
+    
+    query = db.query(ChatHistory).filter(ChatHistory.user_id == current_user_id)
     
     if session_id:
         query = query.filter(ChatHistory.session_id == session_id)
@@ -109,14 +116,18 @@ async def get_chat_history(
 
 @router.get("/sessions")
 async def get_chat_sessions(
+    request: Request,
     limit: int = Query(default=20, ge=1, le=100, description="会话数量限制"),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    db: Session = Depends(get_db)
 ):
     """获取聊天会话列表"""
+    # 从中间件获取用户信息
+    user_info = request.state.user
+    current_user_id = user_info['id']
+    
     # 获取用户的会话列表
     sessions = db.query(ChatHistory.session_id).filter(
-        ChatHistory.user_id == current_user.id
+        ChatHistory.user_id == current_user_id
     ).distinct().limit(limit).all()
     
     session_list = []
@@ -126,7 +137,7 @@ async def get_chat_sessions(
         # 获取会话的最后一条消息
         last_message = db.query(ChatHistory).filter(
             ChatHistory.session_id == session_id,
-            ChatHistory.user_id == current_user.id
+            ChatHistory.user_id == current_user_id
         ).order_by(ChatHistory.created_at.desc()).first()
         
         if last_message:
@@ -137,7 +148,7 @@ async def get_chat_sessions(
                 "last_message_time": last_message.created_at,
                 "message_count": db.query(ChatHistory).filter(
                     ChatHistory.session_id == session_id,
-                    ChatHistory.user_id == current_user.id
+                    ChatHistory.user_id == current_user_id
                 ).count()
             })
     
@@ -147,14 +158,18 @@ async def get_chat_sessions(
 @router.delete("/session/{session_id}")
 async def delete_chat_session(
     session_id: str,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    request: Request,
+    db: Session = Depends(get_db)
 ):
     """删除聊天会话"""
+    # 从中间件获取用户信息
+    user_info = request.state.user
+    current_user_id = user_info['id']
+    
     # 删除会话中的所有消息
     deleted_count = db.query(ChatHistory).filter(
         ChatHistory.session_id == session_id,
-        ChatHistory.user_id == current_user.id
+        ChatHistory.user_id == current_user_id
     ).delete()
     
     db.commit()
@@ -230,10 +245,10 @@ def get_knowledge_sources(db: Session, knowledge_context: str) -> List[dict]:
 @router.post("/stream")
 async def stream_chat_message(
     message_data: ChatMessage,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    request: Request,
+    db: Session = Depends(get_db)
 ):
     """流式聊天消息（WebSocket实现的基础）"""
     # 这里可以实现WebSocket流式响应
     # 目前返回普通响应
-    return await send_chat_message(message_data, db, current_user)
+    return await send_chat_message(message_data, request, db)

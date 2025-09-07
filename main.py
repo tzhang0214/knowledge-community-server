@@ -11,6 +11,7 @@ from contextlib import asynccontextmanager
 from src.config import settings, LOGGING_CONFIG
 from src.database import init_db
 from src.routers import auth, knowledge, search, chat, admin
+from src.middleware import AuthMiddleware
 
 
 # 配置日志
@@ -58,6 +59,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 添加认证中间件
+app.add_middleware(AuthMiddleware)
 
 
 # 全局异常处理
