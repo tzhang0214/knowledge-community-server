@@ -34,6 +34,14 @@ async def create_user(
     current_user: User = Depends(get_current_admin_user)
 ):
     """创建用户（管理员）"""
+    # 检查工号是否已存在
+    existing_id = db.query(User).filter(User.id == user_data.id).first()
+    if existing_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="工号已存在"
+        )
+    
     # 检查用户名是否已存在
     existing_user = db.query(User).filter(User.username == user_data.username).first()
     if existing_user:
@@ -54,6 +62,7 @@ async def create_user(
     # 创建新用户
     hashed_password = get_password_hash(user_data.password)
     db_user = User(
+        id=user_data.id,
         username=user_data.username,
         email=user_data.email,
         password_hash=hashed_password,
@@ -69,7 +78,7 @@ async def create_user(
 
 @router.put("/users/{user_id}", response_model=UserResponse)
 async def update_user(
-    user_id: int,
+    user_id: str,
     user_data: dict,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_admin_user)
@@ -95,7 +104,7 @@ async def update_user(
 
 @router.delete("/users/{user_id}")
 async def delete_user(
-    user_id: int,
+    user_id: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_admin_user)
 ):

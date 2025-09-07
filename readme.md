@@ -44,7 +44,7 @@ ISP知识库系统后端服务，为前端React应用提供数据支持和AI智�
 #### 1. 用户表 (users)
 ```sql
 CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id VARCHAR(36) PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
@@ -126,7 +126,7 @@ CREATE TABLE flow_modules (
 ```sql
 CREATE TABLE chat_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
+    user_id VARCHAR(36),
     session_id VARCHAR(100) NOT NULL,
     message_type VARCHAR(20) NOT NULL,        -- 'user' | 'assistant'
     content TEXT NOT NULL,
@@ -140,7 +140,7 @@ CREATE TABLE chat_history (
 ```sql
 CREATE TABLE search_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
+    user_id VARCHAR(36),
     query VARCHAR(500) NOT NULL,
     result_count INTEGER,
     search_time_ms INTEGER,

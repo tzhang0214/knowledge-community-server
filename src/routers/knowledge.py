@@ -14,7 +14,7 @@ from src.cache import (
     clear_knowledge_cache
 )
 
-router = APIRouter(prefix="/api/v1/knowledge", tags=["知识库"])
+router = APIRouter(prefix="/knowledge", tags=["知识库"])
 
 
 @router.get("/categories")

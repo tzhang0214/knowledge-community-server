@@ -14,6 +14,14 @@ router = APIRouter(prefix="/auth", tags=["认证"])
 @router.post("/register", response_model=TokenResponse)
 async def register(user_data: UserCreate, db: Session = Depends(get_db)):
     """用户注册"""
+    # 检查工号是否已存在
+    existing_id = db.query(User).filter(User.id == user_data.id).first()
+    if existing_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="工号已存在"
+        )
+    
     # 检查用户名是否已存在
     existing_user = db.query(User).filter(User.username == user_data.username).first()
     if existing_user:
@@ -34,6 +42,7 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
     # 创建新用户
     hashed_password = get_password_hash(user_data.password)
     db_user = User(
+        id=user_data.id,
         username=user_data.username,
         email=user_data.email,
         password_hash=hashed_password,

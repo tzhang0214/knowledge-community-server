@@ -162,7 +162,7 @@ async def delete_chat_session(
     return {"message": f"删除了 {deleted_count} 条消息"}
 
 
-def get_chat_history_for_session(db: Session, session_id: str, user_id: int) -> List[dict]:
+def get_chat_history_for_session(db: Session, session_id: str, user_id: str) -> List[dict]:
     """获取会话的聊天历史"""
     messages = db.query(ChatHistory).filter(
         ChatHistory.session_id == session_id,

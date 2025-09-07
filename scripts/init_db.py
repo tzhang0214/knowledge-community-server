@@ -23,7 +23,7 @@ def create_sample_data():
     try:
         # 创建管理员用户
         admin_user = User(
-            id=generate_uuid(),
+            id="ADMIN001",
             username="admin",
             email="admin@example.com",
             password_hash=get_password_hash("admin123"),
@@ -33,7 +33,7 @@ def create_sample_data():
         
         # 创建测试用户
         test_user = User(
-            id=generate_uuid(),
+            id="USER001",
             username="testuser",
             email="test@example.com",
             password_hash=get_password_hash("test123"),

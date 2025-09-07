@@ -23,6 +23,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     """用户创建模型"""
+    id: str = Field(..., min_length=1, max_length=36, description="用户工号")
     password: str = Field(..., min_length=6)
 
 
@@ -34,7 +35,7 @@ class UserLogin(BaseModel):
 
 class UserResponse(UserBase):
     """用户响应模型"""
-    id: int
+    id: str
     role: str
     is_active: bool
     created_at: datetime
@@ -218,7 +219,7 @@ class ChatResponse(BaseModel):
 class ChatHistoryResponse(BaseModel):
     """聊天历史响应模型"""
     id: int
-    user_id: Optional[int] = None
+    user_id: Optional[str] = None
     session_id: str
     message_type: str
     content: str
