@@ -44,8 +44,7 @@ def get_db():
 def init_db():
     """初始化数据库"""
     from src.models import (
-        User, KnowledgeCategory, KnowledgeItem, 
-        FlowVersion, FlowModule, FlowArchitecture, FlowArchitectureItem, ChatHistory, SearchLog
+        User, KnowledgeCategory, KnowledgeItem, ChatHistory
     )
     
     # 创建所有表

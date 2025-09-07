@@ -10,7 +10,7 @@ from contextlib import asynccontextmanager
 
 from src.config import settings, LOGGING_CONFIG
 from src.database import init_db
-from src.routers import auth, knowledge, flow, search, chat, admin
+from src.routers import auth, knowledge, search, chat, admin
 
 
 # 配置日志
@@ -114,7 +114,6 @@ async def root():
 # 注册路由
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(knowledge.router, prefix="/api/v1")
-app.include_router(flow.router, prefix="/api/v1")
 app.include_router(search.router, prefix="/api/v1")
 app.include_router(chat.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")

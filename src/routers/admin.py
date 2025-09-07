@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta
 from src.database import get_db
-from src.models import User, KnowledgeItem, ChatHistory, SearchLog
+from src.models import User, KnowledgeItem, ChatHistory
 from src.schemas import UserCreate, UserResponse, SystemStats
 from src.auth import get_current_admin_user, get_password_hash
 from src.cache import clear_all_cache
@@ -143,8 +143,8 @@ async def get_system_stats(
     # 总聊天会话数
     total_chat_sessions = db.query(ChatHistory.session_id).distinct().count()
     
-    # 总搜索次数
-    total_searches = db.query(SearchLog).count()
+    # 总搜索次数（SearchLog已删除，设为0）
+    total_searches = 0
     
     # 今日活跃用户数
     today = datetime.utcnow().date()
@@ -183,10 +183,8 @@ async def get_daily_stats(
             func.date(ChatHistory.created_at) == date
         ).count()
         
-        # 当日搜索次数
-        searches = db.query(SearchLog).filter(
-            func.date(SearchLog.created_at) == date
-        ).count()
+        # 当日搜索次数（SearchLog已删除，设为0）
+        searches = 0
         
         stats.append({
             "date": date.isoformat(),
@@ -225,33 +223,6 @@ async def clear_cache(
         message = "聊天缓存已清除"
     
     return {"message": message}
-
-
-@router.get("/logs/search")
-async def get_search_logs(
-    skip: int = Query(default=0, ge=0, description="跳过数量"),
-    limit: int = Query(default=100, ge=1, le=1000, description="返回数量"),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
-):
-    """获取搜索日志（管理员）"""
-    logs = db.query(SearchLog).join(User).order_by(
-        SearchLog.created_at.desc()
-    ).offset(skip).limit(limit).all()
-    
-    return {
-        "logs": [
-            {
-                "id": log.id,
-                "user": log.user.username if log.user else None,
-                "query": log.query,
-                "result_count": log.result_count,
-                "search_time_ms": log.search_time_ms,
-                "created_at": log.created_at
-            }
-            for log in logs
-        ]
-    }
 
 
 @router.get("/logs/chat")

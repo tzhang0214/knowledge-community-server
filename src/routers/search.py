@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from src.database import get_db
-from src.models import KnowledgeItem, KnowledgeCategory, FlowModule, FlowVersion, SearchLog, User
+from src.models import KnowledgeItem, KnowledgeCategory, User
 from src.schemas import SearchRequest, SearchResponse, SearchResult
 from src.auth import get_current_user, get_current_active_user
 from src.cache import get_cached_search_result, set_cached_search_result
@@ -19,7 +19,6 @@ router = APIRouter(prefix="/search", tags=["搜索"])
 @router.get("", response_model=SearchResponse)
 async def search(
     q: str = Query(..., min_length=1, description="搜索关键词"),
-    type: str = Query(default="all", pattern="^(knowledge|flow|all)$", description="搜索类型"),
     limit: int = Query(default=10, ge=1, le=100, description="结果数量限制"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
@@ -28,39 +27,19 @@ async def search(
     start_time = time.time()
     
     # 尝试从缓存获取
-    cache_key = f"{q}_{type}_{limit}"
+    cache_key = f"{q}_{limit}"
     cached_result = get_cached_search_result(cache_key)
     if cached_result:
         return SearchResponse(**cached_result)
     
-    results = []
-    
     # 搜索知识项
-    if type in ["knowledge", "all"]:
-        knowledge_results = search_knowledge(db, q, limit)
-        results.extend(knowledge_results)
-    
-    # 搜索架构图模块
-    if type in ["flow", "all"]:
-        flow_results = search_flow(db, q, limit)
-        results.extend(flow_results)
+    results = search_knowledge(db, q, limit)
     
     # 按相关性排序（简单实现）
     results = sorted(results, key=lambda x: x.get("relevance", 0), reverse=True)
     
     # 限制结果数量
     results = results[:limit]
-    
-    # 记录搜索日志
-    search_time = int((time.time() - start_time) * 1000)
-    search_log = SearchLog(
-        user_id=current_user.id,
-        query=q,
-        result_count=len(results),
-        search_time_ms=search_time
-    )
-    db.add(search_log)
-    db.commit()
     
     # 缓存结果
     result_data = {
@@ -111,40 +90,6 @@ def search_knowledge(db: Session, query: str, limit: int) -> List[SearchResult]:
     return results
 
 
-def search_flow(db: Session, query: str, limit: int) -> List[SearchResult]:
-    """搜索架构图模块"""
-    results = []
-    
-    # 构建搜索条件
-    search_conditions = or_(
-        FlowModule.title.contains(query),
-        FlowModule.description.contains(query),
-        FlowModule.introduction.contains(query),
-        FlowModule.principle.contains(query)
-    )
-    
-    # 执行搜索
-    modules = db.query(FlowModule).join(FlowVersion).filter(
-        search_conditions,
-        FlowVersion.is_active == True
-    ).limit(limit).all()
-    
-    for module in modules:
-        # 计算相关性分数
-        relevance = calculate_relevance(module, query)
-        
-        results.append(SearchResult(
-            type="flow",
-            category=module.version.title if module.version else None,
-            title=module.title,
-            description=module.description,
-            external_link=module.external_link,
-            relevance=relevance
-        ))
-    
-    return results
-
-
 def calculate_relevance(item, query: str) -> float:
     """计算相关性分数"""
     # 简单的相关性计算
@@ -180,14 +125,13 @@ def calculate_relevance(item, query: str) -> float:
 @router.get("/enhanced", response_model=SearchResponse)
 async def enhanced_search(
     q: str = Query(..., min_length=1, description="搜索关键词"),
-    type: str = Query(default="all", pattern="^(knowledge|flow|all)$", description="搜索类型"),
     limit: int = Query(default=10, ge=1, le=100, description="结果数量限制"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
     """AI增强搜索"""
     # 先执行基础搜索
-    basic_results = await search(q, type, limit, db, current_user)
+    basic_results = await search(q, limit, db, current_user)
     
     # 使用AI增强搜索结果
     if basic_results.results:
@@ -212,17 +156,9 @@ async def get_search_suggestions(
     # 从知识项标题中获取建议
     knowledge_suggestions = db.query(KnowledgeItem.title).filter(
         KnowledgeItem.title.contains(q)
-    ).limit(5).all()
+    ).limit(10).all()
     
     for suggestion in knowledge_suggestions:
-        suggestions.append(suggestion[0])
-    
-    # 从架构图模块标题中获取建议
-    flow_suggestions = db.query(FlowModule.title).filter(
-        FlowModule.title.contains(q)
-    ).limit(5).all()
-    
-    for suggestion in flow_suggestions:
         suggestions.append(suggestion[0])
     
     # 去重并限制数量
@@ -237,17 +173,7 @@ async def get_popular_searches(
     db: Session = Depends(get_db)
 ):
     """获取热门搜索"""
-    # 统计搜索频率
-    popular_searches = db.query(
-        SearchLog.query,
-        db.func.count(SearchLog.id).label('count')
-    ).group_by(SearchLog.query).order_by(
-        db.func.count(SearchLog.id).desc()
-    ).limit(limit).all()
-    
+    # 由于删除了SearchLog，返回空结果
     return {
-        "popular_searches": [
-            {"query": item.query, "count": item.count}
-            for item in popular_searches
-        ]
+        "popular_searches": []
     }

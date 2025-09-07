@@ -156,31 +156,6 @@ def set_cached_knowledge_item(item_id: int, data: Dict[str, Any]):
     return cache_manager.set(key, data, CACHE_TTL["knowledge"])
 
 
-# 架构图缓存函数
-def get_cached_flow_version(version_id: str):
-    """获取缓存的架构图版本"""
-    key = cache_manager._generate_key(CACHE_KEYS["flow_version"], version_id=version_id)
-    return cache_manager.get(key)
-
-
-def set_cached_flow_version(version_id: str, data: Dict[str, Any]):
-    """设置缓存的架构图版本"""
-    key = cache_manager._generate_key(CACHE_KEYS["flow_version"], version_id=version_id)
-    return cache_manager.set(key, data, CACHE_TTL["flow"])
-
-
-def get_cached_flow_module(module_id: str):
-    """获取缓存的架构图模块"""
-    key = cache_manager._generate_key(CACHE_KEYS["flow_module"], module_id=module_id)
-    return cache_manager.get(key)
-
-
-def set_cached_flow_module(module_id: str, data: Dict[str, Any]):
-    """设置缓存的架构图模块"""
-    key = cache_manager._generate_key(CACHE_KEYS["flow_module"], module_id=module_id)
-    return cache_manager.set(key, data, CACHE_TTL["flow"])
-
-
 # 搜索缓存函数
 def get_cached_search_result(query: str):
     """获取缓存的搜索结果"""
@@ -214,9 +189,6 @@ def clear_knowledge_cache():
     cache_manager.clear_pattern("knowledge:*")
 
 
-def clear_flow_cache():
-    """清除架构图缓存"""
-    cache_manager.clear_pattern("flow:*")
 
 
 def clear_search_cache():

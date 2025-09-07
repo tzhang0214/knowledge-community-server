@@ -56,8 +56,6 @@ QWEN_CONFIG = {
 CACHE_KEYS = {
     "knowledge_categories": "knowledge:categories",
     "knowledge_item": "knowledge:item:{item_id}",
-    "flow_version": "flow:version:{version_id}",
-    "flow_module": "flow:module:{module_id}",
     "search_result": "search:result:{query_hash}",
     "chat_session": "chat:session:{session_id}"
 }
@@ -65,7 +63,6 @@ CACHE_KEYS = {
 # 缓存过期时间
 CACHE_TTL = {
     "knowledge": 3600,      # 1小时
-    "flow": 1800,          # 30分钟
     "search": 300,         # 5分钟
     "chat": 1800          # 30分钟
 }
