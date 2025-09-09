@@ -5,7 +5,7 @@ REM 设置环境变量
 set SECRET_KEY=your_secret_key_here_make_it_long_and_random_1234567890abcdef
 set QWEN_API_KEY=test_key
 
-REM 启动服务器
-python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000 --log-level warning
+REM 启动服务器（生产模式，无reload）
+python -m uvicorn main:app --host 0.0.0.0 --port 8000 --log-level warning
 
 pause

@@ -33,6 +33,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
     
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         """处理请求"""
+        # 跳过OPTIONS请求（CORS预检请求）
+        if request.method == "OPTIONS":
+            return await call_next(request)
+        
         # 检查是否需要跳过认证
         if self._should_skip_auth(request):
             return await call_next(request)

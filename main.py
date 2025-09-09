@@ -51,16 +51,16 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# 配置CORS
+# 配置CORS（必须先添加，这样CORS会先处理预检请求）
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 生产环境中应该指定具体的前端域名
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # 允许前端域名
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
-# 添加认证中间件
+# 添加认证中间件（在CORS之后添加）
 app.add_middleware(AuthMiddleware)
 
 
@@ -131,5 +131,5 @@ if __name__ == "__main__":
         host=settings.host,
         port=settings.port,
         reload=settings.debug,
-        log_level=settings.log_level.lower()
+        log_level="warning"  # 设置为warning级别，减少日志输出
     )
