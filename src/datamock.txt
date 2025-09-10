@@ -1,0 +1,1081 @@
+// 知识点数据配置
+export const knowledgeData = {
+  "camera-imaging": {
+    title: "📷 相机成像原理",
+    description: "深入了解相机从光学成像到数字信号处理的完整流程，包括镜头系统、感光元件、光电转换等核心技术原理。",
+    items: [
+      {
+        id: "550e8400-e29b-41d4-a716-446655440001",
+        title: "光学系统",
+        description: "镜头组、光圈、焦距等光学元件组成成像系统",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440002",
+        title: "感光元件",
+        description: "CMOS/CCD传感器将光信号转换为电信号",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440003",
+        title: "光电转换",
+        description: "光子激发电子，产生电荷积累和电压信号",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440004",
+        title: "采样量化",
+        description: "空间和时间维度的离散化采样过程",
+        status: "pending"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440005",
+        title: "色彩滤波",
+        description: "Bayer阵列等色彩滤镜实现色彩分离",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440006",
+        title: "噪声来源",
+        description: "光子噪声、暗电流噪声、读出噪声等",
+        status: "pending"
+      }
+    ]
+  },
+  
+  "isp-algorithms": {
+    title: "🔬 ISP处理算法",
+    description: "图像信号处理的核心算法集合，包括去马赛克、白平衡、降噪、色彩校正等关键技术，实现从原始传感器数据到高质量图像的转换。",
+    items: [
+      {
+        id: "550e8400-e29b-41d4-a716-446655440007",
+        title: "去马赛克",
+        description: "Demosaic算法从Bayer阵列重建全彩图像",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440008",
+        title: "白平衡",
+        description: "调整RGB通道比例，校正色温偏差",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440009",
+        title: "降噪算法",
+        description: "双边滤波、非局部均值等降噪技术",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440010",
+        title: "色彩校正",
+        description: "色彩空间转换和色彩增强处理",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440011",
+        title: "锐化增强",
+        description: "拉普拉斯算子、USM等锐化算法",
+        status: "pending"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440012",
+        title: "伽马校正",
+        description: "非线性亮度调整，适应人眼视觉特性",
+        status: "completed"
+      }
+    ]
+  },
+  
+  "isp-pipeline": {
+    title: "🔄 ISP处理通路",
+    description: "完整的图像处理流水线架构，涵盖从原始数据预处理到最终图像输出的全流程，包括各模块间的数据传递和时序控制。",
+    items: [
+      {
+        id: "550e8400-e29b-41d4-a716-446655440013",
+        title: "原始数据",
+        description: "Raw格式图像数据，包含传感器原始信息",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440014",
+        title: "预处理",
+        description: "黑电平校正、坏点检测、镜头阴影校正",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440015",
+        title: "去马赛克",
+        description: "色彩插值，重建完整RGB图像",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440016",
+        title: "色彩处理",
+        description: "白平衡、色彩校正、饱和度调整",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440017",
+        title: "图像增强",
+        description: "降噪、锐化、对比度增强等",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440018",
+        title: "后处理",
+        description: "伽马校正、压缩编码、格式转换",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440019",
+        title: "AI处理模块",
+        description: "深度学习算法进行图像质量增强和智能优化",
+        status: "future"
+      }
+    ]
+  },
+  
+  "software-stack": {
+    title: "💻 软件开发技术栈",
+    description: "相机应用开发所需的技术栈，包括编程语言、图像处理库、并行计算框架、算法优化和硬件加速等核心技术。",
+    items: [
+      {
+        id: "550e8400-e29b-41d4-a716-446655440020",
+        title: "编程语言",
+        description: "C/C++、Python、MATLAB等高性能语言",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440021",
+        title: "图像处理库",
+        description: "OpenCV、PIL、scikit-image等",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440022",
+        title: "并行计算",
+        description: "OpenCL、CUDA、SIMD指令集优化",
+        status: "pending"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440023",
+        title: "算法优化",
+        description: "内存管理、缓存优化、算法复杂度",
+        status: "future"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440024",
+        title: "硬件加速",
+        description: "DSP、GPU、FPGA等专用硬件",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440025",
+        title: "开发工具",
+        description: "调试器、性能分析器、代码优化工具",
+        status: "future"
+      }
+    ]
+  },
+
+  "business-scenarios": {
+    title: "🎯 业务场景应用",
+    description: "相机功能在不同业务场景下的应用实现，包括各种拍摄模式、专业功能、AI增强和创意效果等用户体验优化。",
+    items: [
+      {
+        id: "550e8400-e29b-41d4-a716-446655440026",
+        title: "标准模式",
+        description: "适合日常拍摄，支持自动优化参数，平衡画质与性能",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440027",
+        title: "肖像模式",
+        description: "利用计算摄影技术实现自然景深效果，突出主体，适合人像拍摄",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440028",
+        title: "夜间模式",
+        description: "在低光环境下自动激活，通过长时间曝光和智能处理捕捉更多细节",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440029",
+        title: "全景模式",
+        description: "移动手机拼接拍摄，适合拍摄广阔场景，支持360度全景",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440030",
+        title: "延时摄影",
+        description: "压缩快播视频，呈现时间流逝效果，如记录日落或云朵移动",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440031",
+        title: "慢动作",
+        description: "将视频放慢播放，突出细节，适合拍摄运动或水流",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440032",
+        title: "电影效果",
+        description: "模拟电影拍摄风格，提供专业级视频录制体验",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440033",
+        title: "RAW格式拍摄",
+        description: "保留更多图像信息，方便后期处理，适合专业摄影",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440034",
+        title: "曝光调整",
+        description: "通过滑动屏幕调整照片亮度，实时预览效果",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440035",
+        title: "对焦锁定",
+        description: "长按对焦框锁定焦点，适合拍摄移动物体",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440036",
+        title: "风格滤镜",
+        description: "提供多种滤镜效果，如黑白、复古等，为照片增添艺术气息",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440037",
+        title: "HDR模式",
+        description: "高动态范围拍摄，自动融合多帧不同曝光图像",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440038",
+        title: "专业模式",
+        description: "手动调节ISO、快门速度、白平衡等参数，满足专业需求",
+        status: "completed"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440039",
+        title: "AI场景识别",
+        description: "智能识别拍摄场景，自动优化参数设置",
+        status: "future"
+      },
+      {
+        id: "550e8400-e29b-41d4-a716-446655440040",
+        title: "AR滤镜",
+        description: "增强现实滤镜效果，实时叠加虚拟元素",
+        status: "future"
+      }
+    ]
+  }
+};
+
+// 知识点详细数据
+export const knowledgeDetails = {
+  "550e8400-e29b-41d4-a716-446655440001": {
+    title: "光学系统",
+    items: [
+      {
+        title: "镜头组",
+        description: "由多个透镜组成的光学系统，用于聚焦光线到传感器上",
+        link: "https://en.wikipedia.org/wiki/Camera_lens"
+      },
+      {
+        title: "光圈控制",
+        description: "调节进光量和景深，影响图像的亮度和背景虚化效果",
+        link: "https://en.wikipedia.org/wiki/Aperture"
+      },
+      {
+        title: "焦距调节",
+        description: "改变镜头与传感器的距离，实现远近景物的清晰成像",
+        link: "https://en.wikipedia.org/wiki/Focal_length"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440002": {
+    title: "感光元件",
+    items: [
+      {
+        title: "CMOS传感器",
+        description: "互补金属氧化物半导体传感器，功耗低、集成度高",
+        link: "https://en.wikipedia.org/wiki/CMOS_sensor"
+      },
+      {
+        title: "CCD传感器",
+        description: "电荷耦合器件传感器，画质好但功耗较高",
+        link: "https://en.wikipedia.org/wiki/Charge-coupled_device"
+      },
+      {
+        title: "像素结构",
+        description: "光电二极管、传输门、读出电路等组成的像素单元",
+        link: "https://en.wikipedia.org/wiki/Pixel"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440003": {
+    title: "光电转换",
+    items: [
+      {
+        title: "光子吸收",
+        description: "光子撞击半导体材料，激发电子-空穴对",
+        link: "https://en.wikipedia.org/wiki/Photoelectric_effect"
+      },
+      {
+        title: "电荷积累",
+        description: "在像素单元中积累电荷，形成电压信号",
+        link: "https://en.wikipedia.org/wiki/Charge_accumulation"
+      },
+      {
+        title: "信号读出",
+        description: "将积累的电荷转换为数字信号输出",
+        link: "https://en.wikipedia.org/wiki/Analog-to-digital_converter"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440004": {
+    title: "采样量化",
+    items: [
+      {
+        title: "空间采样",
+        description: "在空间维度上对连续图像进行离散化采样",
+        link: "https://en.wikipedia.org/wiki/Sampling_(signal_processing)"
+      },
+      {
+        title: "时间采样",
+        description: "在时间维度上对连续信号进行离散化采样",
+        link: "https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem"
+      },
+      {
+        title: "量化过程",
+        description: "将连续的模拟信号转换为离散的数字信号",
+        link: "https://en.wikipedia.org/wiki/Quantization_(signal_processing)"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440005": {
+    title: "色彩滤波",
+    items: [
+      {
+        title: "Bayer阵列",
+        description: "RGB色彩滤镜阵列，实现单传感器彩色成像",
+        link: "https://en.wikipedia.org/wiki/Bayer_filter"
+      },
+      {
+        title: "色彩分离",
+        description: "通过不同颜色的滤镜分离红、绿、蓝三色光",
+        link: "https://en.wikipedia.org/wiki/Color_filter_array"
+      },
+      {
+        title: "色彩插值",
+        description: "从Bayer阵列重建完整RGB图像的过程",
+        link: "https://en.wikipedia.org/wiki/Demosaicing"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440006": {
+    title: "噪声来源",
+    items: [
+      {
+        title: "光子噪声",
+        description: "光子到达的随机性导致的量子噪声",
+        link: "https://en.wikipedia.org/wiki/Shot_noise"
+      },
+      {
+        title: "暗电流噪声",
+        description: "无光照时仍存在的电流噪声",
+        link: "https://en.wikipedia.org/wiki/Dark_current_(physics)"
+      },
+      {
+        title: "读出噪声",
+        description: "信号读出过程中引入的电子噪声",
+        link: "https://en.wikipedia.org/wiki/Read_noise"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440007": {
+    title: "去马赛克",
+    items: [
+      {
+        title: "双线性插值",
+        description: "简单的色彩插值算法，计算速度快但质量一般",
+        link: "https://en.wikipedia.org/wiki/Bilinear_interpolation"
+      },
+      {
+        title: "边缘自适应",
+        description: "根据边缘信息调整插值方向，提高图像质量",
+        link: "https://en.wikipedia.org/wiki/Edge-preserving_smoothing"
+      },
+      {
+        title: "频率域方法",
+        description: "在频率域进行色彩重建，质量较高但计算复杂",
+        link: "https://en.wikipedia.org/wiki/Frequency_domain"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440008": {
+    title: "白平衡",
+    items: [
+      {
+        title: "灰度世界法",
+        description: "假设图像的平均色彩为灰色，调整RGB通道比例",
+        link: "https://en.wikipedia.org/wiki/Gray_world_assumption"
+      },
+      {
+        title: "完美反射法",
+        description: "假设图像中最亮的像素为白色，进行白平衡校正",
+        link: "https://en.wikipedia.org/wiki/White_balance"
+      },
+      {
+        title: "色温调节",
+        description: "根据光源色温调整白平衡参数",
+        link: "https://en.wikipedia.org/wiki/Color_temperature"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440009": {
+    title: "降噪算法",
+    items: [
+      {
+        title: "双边滤波",
+        description: "保持边缘的同时平滑噪声，效果较好",
+        link: "https://en.wikipedia.org/wiki/Bilateral_filter"
+      },
+      {
+        title: "非局部均值",
+        description: "利用图像的非局部相似性进行降噪",
+        link: "https://en.wikipedia.org/wiki/Non-local_means"
+      },
+      {
+        title: "小波降噪",
+        description: "在小波域进行噪声抑制，保持细节",
+        link: "https://en.wikipedia.org/wiki/Wavelet"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440010": {
+    title: "色彩校正",
+    items: [
+      {
+        title: "色彩空间转换",
+        description: "RGB、YUV、HSV等色彩空间之间的转换",
+        link: "https://en.wikipedia.org/wiki/Color_space"
+      },
+      {
+        title: "色彩矩阵",
+        description: "3x3矩阵进行色彩校正和增强",
+        link: "https://en.wikipedia.org/wiki/Color_matrix"
+      },
+      {
+        title: "饱和度调整",
+        description: "调节图像色彩的鲜艳程度",
+        link: "https://en.wikipedia.org/wiki/Colorfulness"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440011": {
+    title: "锐化增强",
+    items: [
+      {
+        title: "拉普拉斯算子",
+        description: "二阶微分算子，突出边缘和细节",
+        link: "https://en.wikipedia.org/wiki/Discrete_Laplace_operator"
+      },
+      {
+        title: "USM锐化",
+        description: "反锐化掩模，增强图像边缘对比度",
+        link: "https://en.wikipedia.org/wiki/Unsharp_masking"
+      },
+      {
+        title: "边缘增强",
+        description: "检测边缘并进行选择性增强",
+        link: "https://en.wikipedia.org/wiki/Edge_detection"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440012": {
+    title: "伽马校正",
+    items: [
+      {
+        title: "伽马函数",
+        description: "非线性亮度调整函数，适应人眼视觉特性",
+        link: "https://en.wikipedia.org/wiki/Gamma_correction"
+      },
+      {
+        title: "sRGB标准",
+        description: "标准RGB色彩空间，包含伽马校正",
+        link: "https://en.wikipedia.org/wiki/SRGB"
+      },
+      {
+        title: "对比度增强",
+        description: "通过伽马校正改善图像对比度",
+        link: "https://en.wikipedia.org/wiki/Contrast_(vision)"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440013": {
+    title: "原始数据",
+    items: [
+      {
+        title: "RAW格式",
+        description: "传感器原始数据格式，保留最多图像信息",
+        link: "https://en.wikipedia.org/wiki/Raw_image_format"
+      },
+      {
+        title: "元数据",
+        description: "包含拍摄参数、时间戳等附加信息",
+        link: "https://en.wikipedia.org/wiki/Metadata"
+      },
+      {
+        title: "数据压缩",
+        description: "无损或有损压缩减少存储空间",
+        link: "https://en.wikipedia.org/wiki/Data_compression"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440014": {
+    title: "预处理",
+    items: [
+      {
+        title: "黑电平校正",
+        description: "校正传感器的暗电流偏移",
+        link: "https://en.wikipedia.org/wiki/Black_level"
+      },
+      {
+        title: "坏点检测",
+        description: "识别和校正传感器坏点",
+        link: "https://en.wikipedia.org/wiki/Dead_pixel"
+      },
+      {
+        title: "镜头阴影校正",
+        description: "校正镜头边缘亮度衰减",
+        link: "https://en.wikipedia.org/wiki/Vignetting"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440015": {
+    title: "去马赛克",
+    items: [
+      {
+        title: "色彩插值",
+        description: "从Bayer阵列重建完整RGB图像",
+        link: "https://en.wikipedia.org/wiki/Demosaicing"
+      },
+      {
+        title: "边缘保护",
+        description: "在插值过程中保护图像边缘",
+        link: "https://en.wikipedia.org/wiki/Edge-preserving_smoothing"
+      },
+      {
+        title: "伪彩色抑制",
+        description: "减少色彩插值产生的伪彩色",
+        link: "https://en.wikipedia.org/wiki/Color_artifacts"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440016": {
+    title: "色彩处理",
+    items: [
+      {
+        title: "白平衡调整",
+        description: "校正不同光源下的色彩偏差",
+        link: "https://en.wikipedia.org/wiki/White_balance"
+      },
+      {
+        title: "色彩校正",
+        description: "调整色彩饱和度和色调",
+        link: "https://en.wikipedia.org/wiki/Color_correction"
+      },
+      {
+        title: "饱和度调整",
+        description: "增强或减弱图像色彩的鲜艳程度",
+        link: "https://en.wikipedia.org/wiki/Colorfulness"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440017": {
+    title: "图像增强",
+    items: [
+      {
+        title: "降噪处理",
+        description: "减少图像噪声，提高信噪比",
+        link: "https://en.wikipedia.org/wiki/Noise_reduction"
+      },
+      {
+        title: "锐化增强",
+        description: "增强图像边缘和细节",
+        link: "https://en.wikipedia.org/wiki/Image_sharpening"
+      },
+      {
+        title: "对比度增强",
+        description: "改善图像对比度，增强视觉效果",
+        link: "https://en.wikipedia.org/wiki/Contrast_(vision)"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440018": {
+    title: "后处理",
+    items: [
+      {
+        title: "伽马校正",
+        description: "非线性亮度调整，适应显示设备",
+        link: "https://en.wikipedia.org/wiki/Gamma_correction"
+      },
+      {
+        title: "压缩编码",
+        description: "JPEG、HEVC等格式压缩存储",
+        link: "https://en.wikipedia.org/wiki/Image_compression"
+      },
+      {
+        title: "格式转换",
+        description: "不同图像格式之间的转换",
+        link: "https://en.wikipedia.org/wiki/Image_format"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440019": {
+    title: "AI处理模块",
+    items: [
+      {
+        title: "深度学习",
+        description: "基于神经网络的图像质量增强",
+        link: "https://en.wikipedia.org/wiki/Deep_learning"
+      },
+      {
+        title: "智能降噪",
+        description: "AI算法进行自适应降噪",
+        link: "https://en.wikipedia.org/wiki/Artificial_intelligence"
+      },
+      {
+        title: "场景识别",
+        description: "智能识别拍摄场景并优化参数",
+        link: "https://en.wikipedia.org/wiki/Computer_vision"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440020": {
+    title: "编程语言",
+    items: [
+      {
+        title: "C/C++",
+        description: "高性能系统编程语言，适合实时处理",
+        link: "https://en.wikipedia.org/wiki/C%2B%2B"
+      },
+      {
+        title: "Python",
+        description: "简洁易用的脚本语言，适合算法原型",
+        link: "https://en.wikipedia.org/wiki/Python_(programming_language)"
+      },
+      {
+        title: "MATLAB",
+        description: "数学计算和图像处理的专业工具",
+        link: "https://en.wikipedia.org/wiki/MATLAB"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440021": {
+    title: "图像处理库",
+    items: [
+      {
+        title: "OpenCV",
+        description: "开源计算机视觉库，功能丰富",
+        link: "https://en.wikipedia.org/wiki/OpenCV"
+      },
+      {
+        title: "PIL/Pillow",
+        description: "Python图像处理库，简单易用",
+        link: "https://en.wikipedia.org/wiki/Python_Imaging_Library"
+      },
+      {
+        title: "scikit-image",
+        description: "基于scipy的图像处理库",
+        link: "https://en.wikipedia.org/wiki/Scikit-image"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440022": {
+    title: "并行计算",
+    items: [
+      {
+        title: "OpenCL",
+        description: "跨平台并行计算框架",
+        link: "https://en.wikipedia.org/wiki/OpenCL"
+      },
+      {
+        title: "CUDA",
+        description: "NVIDIA GPU并行计算平台",
+        link: "https://en.wikipedia.org/wiki/CUDA"
+      },
+      {
+        title: "SIMD指令",
+        description: "单指令多数据并行处理",
+        link: "https://en.wikipedia.org/wiki/SIMD"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440023": {
+    title: "算法优化",
+    items: [
+      {
+        title: "内存管理",
+        description: "优化内存分配和访问模式",
+        link: "https://en.wikipedia.org/wiki/Memory_management"
+      },
+      {
+        title: "缓存优化",
+        description: "提高CPU缓存命中率",
+        link: "https://en.wikipedia.org/wiki/CPU_cache"
+      },
+      {
+        title: "算法复杂度",
+        description: "降低时间和空间复杂度",
+        link: "https://en.wikipedia.org/wiki/Computational_complexity_theory"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440024": {
+    title: "硬件加速",
+    items: [
+      {
+        title: "DSP处理器",
+        description: "数字信号处理器，专用于信号处理",
+        link: "https://en.wikipedia.org/wiki/Digital_signal_processor"
+      },
+      {
+        title: "GPU加速",
+        description: "图形处理器并行计算加速",
+        link: "https://en.wikipedia.org/wiki/General-purpose_computing_on_graphics_processing_units"
+      },
+      {
+        title: "FPGA加速",
+        description: "现场可编程门阵列硬件加速",
+        link: "https://en.wikipedia.org/wiki/Field-programmable_gate_array"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440025": {
+    title: "开发工具",
+    items: [
+      {
+        title: "调试器",
+        description: "GDB、Visual Studio等调试工具",
+        link: "https://en.wikipedia.org/wiki/Debugger"
+      },
+      {
+        title: "性能分析器",
+        description: "Profiler工具分析程序性能",
+        link: "https://en.wikipedia.org/wiki/Profiling_(computer_programming)"
+      },
+      {
+        title: "代码优化工具",
+        description: "编译器优化和代码分析工具",
+        link: "https://en.wikipedia.org/wiki/Compiler_optimization"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440026": {
+    title: "标准模式",
+    items: [
+      {
+        title: "自动曝光",
+        description: "根据环境光线自动调整曝光参数",
+        link: "https://en.wikipedia.org/wiki/Automatic_exposure"
+      },
+      {
+        title: "自动对焦",
+        description: "自动检测并聚焦到主体",
+        link: "https://en.wikipedia.org/wiki/Autofocus"
+      },
+      {
+        title: "场景优化",
+        description: "智能识别场景并优化拍摄参数",
+        link: "https://en.wikipedia.org/wiki/Scene_mode"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440027": {
+    title: "肖像模式",
+    items: [
+      {
+        title: "景深效果",
+        description: "模拟大光圈浅景深效果",
+        link: "https://en.wikipedia.org/wiki/Depth_of_field"
+      },
+      {
+        title: "主体识别",
+        description: "AI识别人物主体并分离背景",
+        link: "https://en.wikipedia.org/wiki/Image_segmentation"
+      },
+      {
+        title: "边缘优化",
+        description: "优化主体边缘，避免不自然效果",
+        link: "https://en.wikipedia.org/wiki/Edge_detection"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440028": {
+    title: "夜间模式",
+    items: [
+      {
+        title: "多帧合成",
+        description: "多张照片合成提高亮度和细节",
+        link: "https://en.wikipedia.org/wiki/Image_stacking"
+      },
+      {
+        title: "降噪算法",
+        description: "专门的低光降噪处理",
+        link: "https://en.wikipedia.org/wiki/Noise_reduction"
+      },
+      {
+        title: "智能曝光",
+        description: "根据场景自动调整曝光时间",
+        link: "https://en.wikipedia.org/wiki/Exposure_(photography)"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440029": {
+    title: "全景模式",
+    items: [
+      {
+        title: "图像拼接",
+        description: "多张照片无缝拼接成全景图",
+        link: "https://en.wikipedia.org/wiki/Image_stitching"
+      },
+      {
+        title: "运动检测",
+        description: "检测手机移动轨迹指导拍摄",
+        link: "https://en.wikipedia.org/wiki/Motion_detection"
+      },
+      {
+        title: "畸变校正",
+        description: "校正广角镜头产生的畸变",
+        link: "https://en.wikipedia.org/wiki/Lens_distortion"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440030": {
+    title: "延时摄影",
+    items: [
+      {
+        title: "时间压缩",
+        description: "将长时间过程压缩为短视频",
+        link: "https://en.wikipedia.org/wiki/Time-lapse_photography"
+      },
+      {
+        title: "帧率控制",
+        description: "控制拍摄间隔和播放速度",
+        link: "https://en.wikipedia.org/wiki/Frame_rate"
+      },
+      {
+        title: "稳定性处理",
+        description: "减少手持拍摄的抖动",
+        link: "https://en.wikipedia.org/wiki/Image_stabilization"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440031": {
+    title: "慢动作",
+    items: [
+      {
+        title: "高速拍摄",
+        description: "高帧率拍摄捕捉快速动作",
+        link: "https://en.wikipedia.org/wiki/High_speed_photography"
+      },
+      {
+        title: "慢放效果",
+        description: "降低播放速度突出细节",
+        link: "https://en.wikipedia.org/wiki/Slow_motion"
+      },
+      {
+        title: "运动分析",
+        description: "分析运动轨迹和速度",
+        link: "https://en.wikipedia.org/wiki/Motion_analysis"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440032": {
+    title: "电影效果",
+    items: [
+      {
+        title: "宽屏比例",
+        description: "21:9等电影宽屏比例",
+        link: "https://en.wikipedia.org/wiki/Aspect_ratio_(image)"
+      },
+      {
+        title: "电影色彩",
+        description: "模拟电影胶片的色彩风格",
+        link: "https://en.wikipedia.org/wiki/Color_grading"
+      },
+      {
+        title: "景深控制",
+        description: "精确控制景深效果",
+        link: "https://en.wikipedia.org/wiki/Depth_of_field"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440033": {
+    title: "RAW格式拍摄",
+    items: [
+      {
+        title: "原始数据",
+        description: "保留传感器原始数据，后期处理空间大",
+        link: "https://en.wikipedia.org/wiki/Raw_image_format"
+      },
+      {
+        title: "无损压缩",
+        description: "保持图像质量的同时减少文件大小",
+        link: "https://en.wikipedia.org/wiki/Lossless_compression"
+      },
+      {
+        title: "专业后期",
+        description: "支持专业级后期处理软件",
+        link: "https://en.wikipedia.org/wiki/Photo_editing"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440034": {
+    title: "曝光调整",
+    items: [
+      {
+        title: "实时预览",
+        description: "滑动调整时实时显示效果",
+        link: "https://en.wikipedia.org/wiki/Live_preview"
+      },
+      {
+        title: "曝光补偿",
+        description: "手动调整曝光量",
+        link: "https://en.wikipedia.org/wiki/Exposure_compensation"
+      },
+      {
+        title: "直方图显示",
+        description: "显示图像亮度分布",
+        link: "https://en.wikipedia.org/wiki/Histogram"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440035": {
+    title: "对焦锁定",
+    items: [
+      {
+        title: "焦点锁定",
+        description: "锁定焦点位置，适合拍摄移动物体",
+        link: "https://en.wikipedia.org/wiki/Focus_lock"
+      },
+      {
+        title: "连续对焦",
+        description: "跟踪移动主体保持对焦",
+        link: "https://en.wikipedia.org/wiki/Continuous_autofocus"
+      },
+      {
+        title: "手动对焦",
+        description: "手动调节焦点位置",
+        link: "https://en.wikipedia.org/wiki/Manual_focus"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440036": {
+    title: "风格滤镜",
+    items: [
+      {
+        title: "黑白滤镜",
+        description: "经典黑白摄影效果",
+        link: "https://en.wikipedia.org/wiki/Black_and_white"
+      },
+      {
+        title: "复古滤镜",
+        description: "模拟胶片时代的色彩风格",
+        link: "https://en.wikipedia.org/wiki/Vintage_photography"
+      },
+      {
+        title: "艺术滤镜",
+        description: "油画、水彩等艺术效果",
+        link: "https://en.wikipedia.org/wiki/Artistic_filter"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440037": {
+    title: "HDR模式",
+    items: [
+      {
+        title: "多曝光合成",
+        description: "不同曝光度的照片合成",
+        link: "https://en.wikipedia.org/wiki/High_dynamic_range_imaging"
+      },
+      {
+        title: "动态范围扩展",
+        description: "扩展图像的亮度范围",
+        link: "https://en.wikipedia.org/wiki/Dynamic_range"
+      },
+      {
+        title: "色调映射",
+        description: "将HDR图像映射到标准显示范围",
+        link: "https://en.wikipedia.org/wiki/Tone_mapping"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440038": {
+    title: "专业模式",
+    items: [
+      {
+        title: "手动ISO",
+        description: "手动调节感光度",
+        link: "https://en.wikipedia.org/wiki/Film_speed"
+      },
+      {
+        title: "手动快门",
+        description: "手动调节快门速度",
+        link: "https://en.wikipedia.org/wiki/Shutter_speed"
+      },
+      {
+        title: "手动白平衡",
+        description: "手动调节色温",
+        link: "https://en.wikipedia.org/wiki/White_balance"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440039": {
+    title: "AI场景识别",
+    items: [
+      {
+        title: "机器学习",
+        description: "基于深度学习的场景识别",
+        link: "https://en.wikipedia.org/wiki/Machine_learning"
+      },
+      {
+        title: "智能优化",
+        description: "根据场景自动优化拍摄参数",
+        link: "https://en.wikipedia.org/wiki/Artificial_intelligence"
+      },
+      {
+        title: "实时分析",
+        description: "实时分析场景特征",
+        link: "https://en.wikipedia.org/wiki/Real-time_computing"
+      }
+    ]
+  },
+  "550e8400-e29b-41d4-a716-446655440040": {
+    title: "AR滤镜",
+    items: [
+      {
+        title: "增强现实",
+        description: "实时叠加虚拟元素到现实场景",
+        link: "https://en.wikipedia.org/wiki/Augmented_reality"
+      },
+      {
+        title: "人脸识别",
+        description: "识别和跟踪人脸特征",
+        link: "https://en.wikipedia.org/wiki/Facial_recognition_system"
+      },
+      {
+        title: "实时渲染",
+        description: "实时渲染3D虚拟元素",
+        link: "https://en.wikipedia.org/wiki/Real-time_rendering"
+      }
+    ]
+  }
+};

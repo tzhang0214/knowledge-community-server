@@ -1,0 +1,182 @@
+# 知识社区服务器 API 接口设计
+
+## 接口概览
+
+基于数据库表设计，我们重新设计了完整的RESTful API接口，包含以下主要模块：
+
+### 1. 认证模块 (`/auth`)
+- **POST** `/auth/register` - 用户注册
+- **POST** `/auth/login` - 用户登录  
+- **GET** `/auth/me` - 获取当前用户信息
+
+### 2. 知识库模块 (`/knowledge`)
+- **GET** `/knowledge/categories` - 获取知识分类列表
+- **GET** `/knowledge/item/{item_id}` - 获取知识项详情
+- **POST** `/knowledge/item` - 创建知识项
+- **PUT** `/knowledge/item/{item_id}` - 更新知识项
+- **DELETE** `/knowledge/item/{item_id}` - 删除知识项
+- **GET** `/knowledge/search` - 搜索知识项
+
+### 3. 知识项详情模块 (`/knowledge`)
+- **GET** `/knowledge/item/{item_id}/details` - 获取知识项详情列表
+- **POST** `/knowledge/item/{item_id}/details` - 创建知识项详情
+- **PUT** `/knowledge/detail/{detail_id}` - 更新知识项详情
+- **DELETE** `/knowledge/detail/{detail_id}` - 删除知识项详情
+- **GET** `/knowledge/detail/{detail_id}` - 获取单个知识项详情
+
+### 4. 聊天模块 (`/chat`)
+- **POST** `/chat/message` - 发送聊天消息
+- **GET** `/chat/history` - 获取聊天历史
+- **GET** `/chat/sessions` - 获取聊天会话列表
+- **DELETE** `/chat/session/{session_id}` - 删除聊天会话
+- **POST** `/chat/stream` - 流式聊天消息
+
+### 5. 搜索模块 (`/search`)
+- **GET** `/search` - 全局搜索
+
+### 6. 管理模块 (`/admin`)
+- **GET** `/admin/stats` - 获取系统统计
+
+## 数据模型更新
+
+### 新增模型
+1. **KnowledgeDetail** - 知识项详情表
+   - 支持为每个知识项添加多个详情子项
+   - 包含外部链接支持
+   - 支持排序功能
+
+### 模型字段更新
+1. **所有ID字段** - 从INTEGER改为VARCHAR(36)，支持UUID格式
+2. **KnowledgeItem** - 移除external_link字段，移至KnowledgeDetail
+3. **ChatHistory** - 添加response_time_ms字段记录响应时间
+
+## API设计特点
+
+### 1. RESTful设计
+- 遵循REST架构风格
+- 使用标准HTTP方法 (GET, POST, PUT, DELETE)
+- 资源路径清晰，层次分明
+
+### 2. 统一响应格式
+- 成功响应包含success、message、data字段
+- 错误响应包含success、message、error_code、details字段
+- 便于前端统一处理
+
+### 3. 认证机制
+- 使用JWT Token进行身份认证
+- 除登录注册外，所有接口都需要Bearer Token
+- 支持用户角色权限控制
+
+### 4. 缓存优化
+- 知识库相关接口使用Redis缓存
+- 自动缓存清理机制
+- 提升接口响应速度
+
+### 5. 错误处理
+- 统一的错误码体系
+- 详细的错误信息
+- 便于调试和问题定位
+
+## 前端集成要点
+
+### 1. 认证流程
+```javascript
+// 1. 用户登录获取token
+const loginResponse = await fetch('/auth/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ id: 'user001', password: 'password123' })
+});
+const { access_token } = await loginResponse.json();
+
+// 2. 后续请求携带token
+const headers = {
+  'Authorization': `Bearer ${access_token}`,
+  'Content-Type': 'application/json'
+};
+```
+
+### 2. 知识库数据获取
+```javascript
+// 获取分类和知识项
+const categories = await fetch('/knowledge/categories', { headers });
+
+// 获取知识项详情
+const itemDetails = await fetch(`/knowledge/item/${itemId}`, { headers });
+
+// 获取知识项的子详情
+const subDetails = await fetch(`/knowledge/item/${itemId}/details`, { headers });
+```
+
+### 3. 聊天功能集成
+```javascript
+// 发送消息
+const chatResponse = await fetch('/chat/message', {
+  method: 'POST',
+  headers,
+  body: JSON.stringify({
+    message: '用户问题',
+    session_id: 'session-123'
+  })
+});
+
+// 获取聊天历史
+const history = await fetch('/chat/history?session_id=session-123', { headers });
+```
+
+### 4. 搜索功能
+```javascript
+// 搜索知识项
+const searchResults = await fetch('/knowledge/search?q=关键词&category_id=camera-imaging', { headers });
+
+// 全局搜索
+const globalSearch = await fetch('/search?q=关键词&type=knowledge', { headers });
+```
+
+## 性能优化建议
+
+### 1. 前端缓存
+- 知识分类列表可以缓存较长时间
+- 用户信息可以缓存到localStorage
+- 聊天历史可以分页加载
+
+### 2. 接口调用优化
+- 使用Promise.all并行调用多个接口
+- 实现接口请求去重
+- 添加loading状态管理
+
+### 3. 错误处理
+- 实现统一的错误处理机制
+- 添加重试机制
+- 提供用户友好的错误提示
+
+## 扩展性考虑
+
+### 1. 未来功能扩展
+- WebSocket支持实时聊天
+- 文件上传支持
+- 批量操作接口
+- 数据导出功能
+
+### 2. 性能扩展
+- 接口分页支持
+- 数据压缩
+- CDN支持
+- 负载均衡
+
+### 3. 安全扩展
+- 接口限流
+- 数据加密
+- 审计日志
+- 权限细化
+
+## 文档维护
+
+详细的API接口文档已生成在 `API接口文档.md` 文件中，包含：
+- 完整的接口规范
+- 请求响应示例
+- 数据模型定义
+- 错误码说明
+- 使用示例代码
+
+前端开发人员可以参考该文档进行接口集成开发。

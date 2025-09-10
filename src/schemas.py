@@ -55,7 +55,6 @@ class TokenResponse(BaseModel):
 # 知识分类相关模型
 class KnowledgeCategoryBase(BaseModel):
     """知识分类基础模型"""
-    category_id: str = Field(..., min_length=1, max_length=100)
     title: str = Field(..., max_length=200)
     icon: Optional[str] = Field(None, max_length=50)
     description: Optional[str] = None
@@ -78,7 +77,7 @@ class KnowledgeCategoryUpdate(BaseModel):
 
 class KnowledgeCategoryResponse(KnowledgeCategoryBase):
     """知识分类响应模型"""
-    id: int
+    id: str
     is_active: bool
     created_at: datetime
     updated_at: datetime
@@ -90,12 +89,11 @@ class KnowledgeCategoryResponse(KnowledgeCategoryBase):
 # 知识项相关模型
 class KnowledgeItemBase(BaseModel):
     """知识项基础模型"""
-    category_id: str = Field(..., max_length=100)
+    category_id: str = Field(..., max_length=36)
     title: str = Field(..., max_length=200)
     description: Optional[str] = None
     status: str = Field(default="completed", pattern="^(completed|pending|future)$")
     content: Optional[str] = None
-    external_link: Optional[str] = Field(None, max_length=500)
     sort_order: int = 0
 
 
@@ -110,13 +108,45 @@ class KnowledgeItemUpdate(BaseModel):
     description: Optional[str] = None
     status: Optional[str] = Field(None, pattern="^(completed|pending|future)$")
     content: Optional[str] = None
-    external_link: Optional[str] = Field(None, max_length=500)
     sort_order: Optional[int] = None
 
 
 class KnowledgeItemResponse(KnowledgeItemBase):
     """知识项响应模型"""
-    id: int
+    id: str
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# 知识项详情相关模型
+class KnowledgeDetailBase(BaseModel):
+    """知识项详情基础模型"""
+    knowledge_id: str = Field(..., max_length=36)
+    title: str = Field(..., max_length=200)
+    description: Optional[str] = None
+    external_link: Optional[str] = Field(None, max_length=500)
+    sort_order: int = 0
+
+
+class KnowledgeDetailCreate(KnowledgeDetailBase):
+    """知识项详情创建模型"""
+    pass
+
+
+class KnowledgeDetailUpdate(BaseModel):
+    """知识项详情更新模型"""
+    title: Optional[str] = Field(None, max_length=200)
+    description: Optional[str] = None
+    external_link: Optional[str] = Field(None, max_length=500)
+    sort_order: Optional[int] = None
+
+
+class KnowledgeDetailResponse(KnowledgeDetailBase):
+    """知识项详情响应模型"""
+    id: str
     created_at: datetime
     updated_at: datetime
 
@@ -142,7 +172,7 @@ class ChatResponse(BaseModel):
 
 class ChatHistoryResponse(BaseModel):
     """聊天历史响应模型"""
-    id: int
+    id: str
     user_id: Optional[str] = None
     session_id: str
     message_type: str

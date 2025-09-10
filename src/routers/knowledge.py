@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from src.database import get_db
-from src.models import KnowledgeCategory, KnowledgeItem, User
-from src.schemas import KnowledgeItemCreate, KnowledgeItemUpdate
+from src.models import KnowledgeCategory, KnowledgeItem, KnowledgeDetail, User
+from src.schemas import KnowledgeItemCreate, KnowledgeItemUpdate, KnowledgeDetailCreate, KnowledgeDetailUpdate, KnowledgeDetailResponse
 from src.cache import (
     get_cached_knowledge_categories, set_cached_knowledge_categories,
     get_cached_knowledge_item, set_cached_knowledge_item,
@@ -38,7 +38,7 @@ async def get_knowledge_categories(
         for category in categories:
             # 查询该分类下的知识项
             items = db.query(KnowledgeItem).filter(
-                KnowledgeItem.category_id == category.category_id
+                KnowledgeItem.category_id == category.id
             ).order_by(KnowledgeItem.sort_order).all()
             
             # 构建知识项列表
@@ -51,7 +51,7 @@ async def get_knowledge_categories(
                     "status": item.status
                 })
             
-            result[category.category_id] = {
+            result[category.id] = {
                 "title": category.title,
                 "items": item_list
             }
@@ -88,7 +88,6 @@ async def get_knowledge_item(
             "description": item.description,
             "status": item.status,
             "content": item.content,
-            "external_link": item.external_link,
             "sort_order": item.sort_order,
             "id": item.id,  # 使用UUID格式的id
             "created_at": item.created_at.isoformat() if item.created_at else None,
@@ -114,7 +113,7 @@ async def create_knowledge_item(
     try:
         # 验证分类是否存在
         category = db.query(KnowledgeCategory).filter(
-            KnowledgeCategory.category_id == item.category_id
+            KnowledgeCategory.id == item.category_id
         ).first()
         if not category:
             raise HTTPException(status_code=400, detail="指定的分类不存在")
@@ -249,3 +248,144 @@ async def search_knowledge(
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"搜索失败: {str(e)}")
+
+
+# KnowledgeDetail相关接口
+@router.get("/item/{item_id}/details", response_model=List[KnowledgeDetailResponse])
+async def get_knowledge_item_details(
+    item_id: str,
+    db: Session = Depends(get_db)
+):
+    """获取知识项的详情列表"""
+    try:
+        # 验证知识项是否存在
+        item = db.query(KnowledgeItem).filter(KnowledgeItem.id == item_id).first()
+        if not item:
+            raise HTTPException(status_code=404, detail="知识项不存在")
+        
+        # 查询详情列表
+        details = db.query(KnowledgeDetail).filter(
+            KnowledgeDetail.knowledge_id == item_id
+        ).order_by(KnowledgeDetail.sort_order).all()
+        
+        return details
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"获取知识项详情失败: {str(e)}")
+
+
+@router.post("/item/{item_id}/details", response_model=KnowledgeDetailResponse)
+async def create_knowledge_item_detail(
+    item_id: str,
+    detail: KnowledgeDetailCreate,
+    db: Session = Depends(get_db)
+):
+    """为知识项创建详情"""
+    try:
+        # 验证知识项是否存在
+        item = db.query(KnowledgeItem).filter(KnowledgeItem.id == item_id).first()
+        if not item:
+            raise HTTPException(status_code=404, detail="知识项不存在")
+        
+        # 创建详情
+        db_detail = KnowledgeDetail(
+            knowledge_id=item_id,
+            **detail.dict()
+        )
+        db.add(db_detail)
+        db.commit()
+        db.refresh(db_detail)
+        
+        # 清除相关缓存
+        clear_knowledge_cache()
+        
+        return db_detail
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"创建知识项详情失败: {str(e)}")
+
+
+@router.put("/detail/{detail_id}", response_model=KnowledgeDetailResponse)
+async def update_knowledge_item_detail(
+    detail_id: str,
+    detail: KnowledgeDetailUpdate,
+    db: Session = Depends(get_db)
+):
+    """更新知识项详情"""
+    try:
+        # 查询详情
+        db_detail = db.query(KnowledgeDetail).filter(KnowledgeDetail.id == detail_id).first()
+        if not db_detail:
+            raise HTTPException(status_code=404, detail="知识项详情不存在")
+        
+        # 更新字段
+        update_data = detail.dict(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(db_detail, field, value)
+        
+        db.commit()
+        db.refresh(db_detail)
+        
+        # 清除相关缓存
+        clear_knowledge_cache()
+        
+        return db_detail
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"更新知识项详情失败: {str(e)}")
+
+
+@router.delete("/detail/{detail_id}")
+async def delete_knowledge_item_detail(
+    detail_id: str,
+    db: Session = Depends(get_db)
+):
+    """删除知识项详情"""
+    try:
+        # 查询详情
+        db_detail = db.query(KnowledgeDetail).filter(KnowledgeDetail.id == detail_id).first()
+        if not db_detail:
+            raise HTTPException(status_code=404, detail="知识项详情不存在")
+        
+        # 删除详情
+        db.delete(db_detail)
+        db.commit()
+        
+        # 清除相关缓存
+        clear_knowledge_cache()
+        
+        return {"message": "知识项详情删除成功"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"删除知识项详情失败: {str(e)}")
+
+
+@router.get("/detail/{detail_id}", response_model=KnowledgeDetailResponse)
+async def get_knowledge_item_detail(
+    detail_id: str,
+    db: Session = Depends(get_db)
+):
+    """根据ID获取知识项详情"""
+    try:
+        # 查询详情
+        detail = db.query(KnowledgeDetail).filter(KnowledgeDetail.id == detail_id).first()
+        if not detail:
+            raise HTTPException(status_code=404, detail="知识项详情不存在")
+        
+        return detail
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"获取知识项详情失败: {str(e)}")

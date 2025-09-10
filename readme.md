@@ -56,10 +56,57 @@ CREATE TABLE users (
 ```
 
 #### 2. 知识分类表 (knowledge_categories)
+删掉了category_id字段，请更新业务代码；
+初始化数据如下(createTime和updateTime随便填一下就行)：
+{
+  {
+    id:"9dc3e593-a495-46f9-a050-738ca7120b00"
+    title: "相机成像原理",
+    icon: "📷",
+    description: "深入了解相机从光学成像到数字信号处理的完整流程，包括镜头系统、感光元件、光电转换等核心技术原理。",
+    sort_order: 0,
+    is_active: 1,
+  },
+  
+  {
+    id:"9dc3e593-a495-46f9-a050-738ca7120b01"
+    title: "ISP处理算法",
+    icon: "🔬",
+    description: "图像信号处理的核心算法集合，包括去马赛克、白平衡、降噪、色彩校正等关键技术，实现从原始传感器数据到高质量图像的转换。",
+    sort_order: 1,
+    is_active: 1,
+  },
+  
+  {
+    id:"9dc3e593-a495-46f9-a050-738ca7120b02"
+    title: "ISP处理通路",
+    icon: "🔄",
+    description: "完整的图像处理流水线架构，涵盖从原始数据预处理到最终图像输出的全流程，包括各模块间的数据传递和时序控制。",
+    sort_order: 1,
+    is_active: 1,
+  },
+  
+  {
+    id:"9dc3e593-a495-46f9-a050-738ca7120b03"
+    title: "软件开发技术栈",
+    icon:"💻",
+    description: "相机应用开发所需的技术栈，包括编程语言、图像处理库、并行计算框架、算法优化和硬件加速等核心技术。",
+    sort_order: 1,
+    is_active: 1,
+  },
+
+  {
+    id:"9dc3e593-a495-46f9-a050-738ca7120b04"
+    title: "业务场景应用",
+    icon:"🎯",
+    description: "相机功能在不同业务场景下的应用实现，包括各种拍摄模式、专业功能、AI增强和创意效果等用户体验优化。",
+    sort_order: 2,
+    is_active: 1,
+  }
+};
 ```sql
 CREATE TABLE knowledge_categories (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    category_id VARCHAR(100) UNIQUE NOT NULL, -- 如 'camera-imaging'
+    id INTEGER PRIMARY KEY,
     title VARCHAR(200) NOT NULL,               -- 如 '📷 相机成像原理'
     icon VARCHAR(50),                          -- 如 '📷'
     description TEXT,
@@ -71,61 +118,104 @@ CREATE TABLE knowledge_categories (
 ```
 
 #### 3. 知识项表 (knowledge_items)
+删掉了external_link，请更新业务代码。
+其中，category_id是外键（knowledge_categories表的id），表示当前知识项归属哪个知识分类。
+初始化数据如下(createTime和updateTime随便填一下就行)：
+{
+    
+    {
+    id: "550e8400-e29b-41d4-a716-446655440026",
+    category_id: "9dc3e593-a495-46f9-a050-738ca7120b04"
+    title: "标准模式",
+    description: "适合日常拍摄，支持自动优化参数，平衡画质与性能",
+    status: "completed"，
+    sort_order: 0,
+    },
+    {
+    id: "550e8400-e29b-41d4-a716-446655440027",
+    category_id: "9dc3e593-a495-46f9-a050-738ca7120b04"
+    title: "肖像模式",
+    description: "利用计算摄影技术实现自然景深效果，突出主体，适合人像拍摄",
+    status: "completed",
+    sort_order: 0,
+    },
+    {
+    id: "550e8400-e29b-41d4-a716-446655440028",
+    category_id: "9dc3e593-a495-46f9-a050-738ca7120b04"
+    title: "夜间模式",
+    description: "在低光环境下自动激活，通过长时间曝光和智能处理捕捉更多细节",
+    status: "completed",
+    sort_order: 0,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440029",
+        category_id: "9dc3e593-a495-46f9-a050-738ca7120b04"
+        title: "全景模式",
+        description: "移动手机拼接拍摄，适合拍摄广阔场景，支持360度全景",
+        status: "completed",
+        sort_order: 0,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440030",
+        category_id: "9dc3e593-a495-46f9-a050-738ca7120b04"
+        title: "延时摄影",
+        description: "压缩快播视频，呈现时间流逝效果，如记录日落或云朵移动",
+        status: "completed",
+        sort_order: 0,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440031",
+        category_id: "9dc3e593-a495-46f9-a050-738ca7120b04"
+        title: "慢动作",
+        description: "将视频放慢播放，突出细节，适合拍摄运动或水流",
+        status: "completed",
+        sort_order: 0,
+        },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440032",
+        category_id: "9dc3e593-a495-46f9-a050-738ca7120b04"
+        title: "电影效果",
+        description: "模拟电影拍摄风格，提供专业级视频录制体验",
+        status: "completed",
+        sort_order: 0,
+    }
+}
 ```sql
 CREATE TABLE knowledge_items (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     category_id VARCHAR(100) NOT NULL,
     title VARCHAR(200) NOT NULL,
     description TEXT,
     status VARCHAR(20) DEFAULT 'completed', -- 'completed' | 'pending' | 'future'
     content TEXT,                            -- 详细内容
-    external_link VARCHAR(500),
     sort_order INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES knowledge_categories(category_id)
+    FOREIGN KEY (category_id) REFERENCES knowledge_categories(id)
 );
 ```
 
-#### 4. 架构图版本表 (flow_versions)
-```sql
-CREATE TABLE flow_versions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    version_id VARCHAR(100) UNIQUE NOT NULL, -- 如 'default', 'version1'
-    title VARCHAR(200) NOT NULL,              -- 如 '标准版本'
-    description TEXT,
-    is_active BOOLEAN DEFAULT TRUE,
-    is_default BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
+#### 3. 知识项详情表 (knowledge_details)
 
-#### 5. 架构图模块表 (flow_modules)
 ```sql
-CREATE TABLE flow_modules (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    version_id VARCHAR(100) NOT NULL,
-    module_id VARCHAR(100) NOT NULL,          -- 如 'mipi-receiver'
-    title VARCHAR(200) NOT NULL,               -- 如 'MIPI CSI-2接收器'
+CREATE TABLE knowledge_details (
+    id INTEGER PRIMARY KEY,
+    category_id VARCHAR(100) NOT NULL,
+    title VARCHAR(200) NOT NULL,
     description TEXT,
-    module_type VARCHAR(50),                   -- 如 'sensor', 'processing'
-    introduction TEXT,                         -- 模块简介
-    principle TEXT,                           -- 实现原理
-    constraints TEXT,                          -- 硬件约束
-    external_link VARCHAR(500),
-    position_x INTEGER,                        -- 在架构图中的X坐标
-    position_y INTEGER,                        -- 在架构图中的Y坐标
+    status VARCHAR(20) DEFAULT 'completed', -- 'completed' | 'pending' | 'future'
+    content TEXT,                            -- 详细内容
+    sort_order INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (version_id) REFERENCES flow_versions(version_id)
+    FOREIGN KEY (category_id) REFERENCES knowledge_categories(id)
 );
 ```
 
 #### 6. 聊天记录表 (chat_history)
 ```sql
 CREATE TABLE chat_history (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     user_id VARCHAR(36),
     session_id VARCHAR(100) NOT NULL,
     message_type VARCHAR(20) NOT NULL,        -- 'user' | 'assistant'
@@ -136,42 +226,20 @@ CREATE TABLE chat_history (
 );
 ```
 
-#### 7. 搜索记录表 (search_logs)
-```sql
-CREATE TABLE search_logs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id VARCHAR(36),
-    query VARCHAR(500) NOT NULL,
-    result_count INTEGER,
-    search_time_ms INTEGER,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
-```
-
 ### 索引设计
 
 ```sql
 -- 知识分类索引
 CREATE INDEX idx_knowledge_categories_active ON knowledge_categories(is_active);
-CREATE INDEX idx_knowledge_categories_sort ON knowledge_categories(sort_order);
 
 -- 知识项索引
 CREATE INDEX idx_knowledge_items_category ON knowledge_items(category_id);
-CREATE INDEX idx_knowledge_items_status ON knowledge_items(status);
-CREATE INDEX idx_knowledge_items_search ON knowledge_items(title, description);
 
--- 架构图模块索引
-CREATE INDEX idx_flow_modules_version ON flow_modules(version_id);
-CREATE INDEX idx_flow_modules_type ON flow_modules(module_type);
 
 -- 聊天记录索引
 CREATE INDEX idx_chat_history_session ON chat_history(session_id);
 CREATE INDEX idx_chat_history_user ON chat_history(user_id);
 
--- 搜索记录索引
-CREATE INDEX idx_search_logs_user ON search_logs(user_id);
-CREATE INDEX idx_search_logs_query ON search_logs(query);
 ```
 
 ## 🔌 API接口设计

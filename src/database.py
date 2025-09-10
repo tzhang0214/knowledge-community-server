@@ -44,7 +44,7 @@ def get_db():
 def init_db():
     """初始化数据库"""
     from src.models import (
-        User, KnowledgeCategory, KnowledgeItem, ChatHistory
+        User, KnowledgeCategory, KnowledgeItem, KnowledgeDetail, ChatHistory
     )
     
     # 创建所有表

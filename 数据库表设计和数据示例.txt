@@ -1,0 +1,857 @@
+#### 1. 用户表 (users)
+```sql
+CREATE TABLE users (
+    id VARCHAR(36) PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(20) DEFAULT 'user', -- 'admin' | 'user'
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### 2. 知识分类表 (knowledge_categories)
+```sql
+CREATE TABLE knowledge_categories (
+    id VARCHAR(36) PRIMARY KEY,
+    category_id VARCHAR(100) UNIQUE NOT NULL,  -- 分类标识符，如 'camera-imaging'
+    title VARCHAR(200) NOT NULL,               -- 如 '📷 相机成像原理'
+    icon VARCHAR(50),                          -- 如 '📷'
+    description TEXT,
+    sort_order INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+初始化数据如下(createTime和updateTime随便填一下就行)：
+```json
+[
+  {
+    "id": "9dc3e593-a495-46f9-a050-738ca7120b00",
+    "category_id": "camera-imaging",
+    "title": "📷 相机成像原理",
+    "icon": "📷",
+    "description": "深入了解相机从光学成像到数字信号处理的完整流程，包括镜头系统、感光元件、光电转换等核心技术原理。",
+    "sort_order": 0,
+    "is_active": true
+  },
+  {
+    "id": "9dc3e593-a495-46f9-a050-738ca7120b01",
+    "category_id": "isp-algorithms",
+    "title": "🔬 ISP处理算法",
+    "icon": "🔬",
+    "description": "图像信号处理的核心算法集合，包括去马赛克、白平衡、降噪、色彩校正等关键技术，实现从原始传感器数据到高质量图像的转换。",
+    "sort_order": 1,
+    "is_active": true
+  },
+  {
+    "id": "9dc3e593-a495-46f9-a050-738ca7120b02",
+    "category_id": "isp-pipeline",
+    "title": "🔄 ISP处理通路",
+    "icon": "🔄",
+    "description": "完整的图像处理流水线架构，涵盖从原始数据预处理到最终图像输出的全流程，包括各模块间的数据传递和时序控制。",
+    "sort_order": 2,
+    "is_active": true
+  },
+  {
+    "id": "9dc3e593-a495-46f9-a050-738ca7120b03",
+    "category_id": "software-stack",
+    "title": "💻 软件开发技术栈",
+    "icon": "💻",
+    "description": "相机应用开发所需的技术栈，包括编程语言、图像处理库、并行计算框架、算法优化和硬件加速等核心技术。",
+    "sort_order": 3,
+    "is_active": true
+  },
+  {
+    "id": "9dc3e593-a495-46f9-a050-738ca7120b04",
+    "category_id": "business-scenarios",
+    "title": "🎯 业务场景应用",
+    "icon": "🎯",
+    "description": "相机功能在不同业务场景下的应用实现，包括各种拍摄模式、专业功能、AI增强和创意效果等用户体验优化。",
+    "sort_order": 4,
+    "is_active": true
+  }
+]
+```
+
+#### 3. 知识项表 (knowledge_items)
+```sql
+CREATE TABLE knowledge_items (
+    id VARCHAR(36) PRIMARY KEY,
+    category_id VARCHAR(100) NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    status VARCHAR(20) DEFAULT 'completed', -- 'completed' | 'pending' | 'future'
+    content TEXT,                            -- 详细内容
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES knowledge_categories(category_id)
+);
+```
+
+其中，category_id是外键（knowledge_categories表的category_id），表示当前知识项归属哪个知识分类。
+初始化数据如下(createTime和updateTime随便填一下就行)：
+```json
+[
+  // 相机成像原理分类的知识项
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440001",
+    "category_id": "camera-imaging",
+    "title": "光学系统",
+    "description": "镜头组、光圈、焦距等光学元件组成成像系统",
+    "status": "completed",
+    "sort_order": 0
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440002",
+    "category_id": "camera-imaging",
+    "title": "感光元件",
+    "description": "CMOS/CCD传感器将光信号转换为电信号",
+    "status": "completed",
+    "sort_order": 1
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440003",
+    "category_id": "camera-imaging",
+    "title": "光电转换",
+    "description": "光子激发电子，产生电荷积累和电压信号",
+    "status": "completed",
+    "sort_order": 2
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440004",
+    "category_id": "camera-imaging",
+    "title": "采样量化",
+    "description": "空间和时间维度的离散化采样过程",
+    "status": "pending",
+    "sort_order": 3
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440005",
+    "category_id": "camera-imaging",
+    "title": "色彩滤波",
+    "description": "Bayer阵列等色彩滤镜实现色彩分离",
+    "status": "completed",
+    "sort_order": 4
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440006",
+    "category_id": "camera-imaging",
+    "title": "噪声来源",
+    "description": "光子噪声、暗电流噪声、读出噪声等",
+    "status": "pending",
+    "sort_order": 5
+  },
+
+  // ISP处理算法分类的知识项
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440007",
+    "category_id": "isp-algorithms",
+    "title": "去马赛克",
+    "description": "Demosaic算法从Bayer阵列重建全彩图像",
+    "status": "completed",
+    "sort_order": 0
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440008",
+    "category_id": "isp-algorithms",
+    "title": "白平衡",
+    "description": "调整RGB通道比例，校正色温偏差",
+    "status": "completed",
+    "sort_order": 1
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440009",
+    "category_id": "isp-algorithms",
+    "title": "降噪算法",
+    "description": "双边滤波、非局部均值等降噪技术",
+    "status": "completed",
+    "sort_order": 2
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440010",
+    "category_id": "isp-algorithms",
+    "title": "色彩校正",
+    "description": "色彩空间转换和色彩增强处理",
+    "status": "completed",
+    "sort_order": 3
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440011",
+    "category_id": "isp-algorithms",
+    "title": "锐化增强",
+    "description": "拉普拉斯算子、USM等锐化算法",
+    "status": "pending",
+    "sort_order": 4
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440012",
+    "category_id": "isp-algorithms",
+    "title": "伽马校正",
+    "description": "非线性亮度调整，适应人眼视觉特性",
+    "status": "completed",
+    "sort_order": 5
+  },
+
+  // ISP处理通路分类的知识项
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440013",
+    "category_id": "isp-pipeline",
+    "title": "原始数据",
+    "description": "Raw格式图像数据，包含传感器原始信息",
+    "status": "completed",
+    "sort_order": 0
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440014",
+    "category_id": "isp-pipeline",
+    "title": "预处理",
+    "description": "黑电平校正、坏点检测、镜头阴影校正",
+    "status": "completed",
+    "sort_order": 1
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440015",
+    "category_id": "isp-pipeline",
+    "title": "去马赛克",
+    "description": "色彩插值，重建完整RGB图像",
+    "status": "completed",
+    "sort_order": 2
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440016",
+    "category_id": "isp-pipeline",
+    "title": "色彩处理",
+    "description": "白平衡、色彩校正、饱和度调整",
+    "status": "completed",
+    "sort_order": 3
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440017",
+    "category_id": "isp-pipeline",
+    "title": "图像增强",
+    "description": "降噪、锐化、对比度增强等",
+    "status": "completed",
+    "sort_order": 4
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440018",
+    "category_id": "isp-pipeline",
+    "title": "后处理",
+    "description": "伽马校正、压缩编码、格式转换",
+    "status": "completed",
+    "sort_order": 5
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440019",
+    "category_id": "isp-pipeline",
+    "title": "AI处理模块",
+    "description": "深度学习算法进行图像质量增强和智能优化",
+    "status": "future",
+    "sort_order": 6
+  },
+
+  // 软件开发技术栈分类的知识项
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440020",
+    "category_id": "software-stack",
+    "title": "编程语言",
+    "description": "C/C++、Python、MATLAB等高性能语言",
+    "status": "completed",
+    "sort_order": 0
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440021",
+    "category_id": "software-stack",
+    "title": "图像处理库",
+    "description": "OpenCV、PIL、scikit-image等",
+    "status": "completed",
+    "sort_order": 1
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440022",
+    "category_id": "software-stack",
+    "title": "并行计算",
+    "description": "OpenCL、CUDA、SIMD指令集优化",
+    "status": "pending",
+    "sort_order": 2
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440023",
+    "category_id": "software-stack",
+    "title": "算法优化",
+    "description": "内存管理、缓存优化、算法复杂度",
+    "status": "future",
+    "sort_order": 3
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440024",
+    "category_id": "software-stack",
+    "title": "硬件加速",
+    "description": "DSP、GPU、FPGA等专用硬件",
+    "status": "completed",
+    "sort_order": 4
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440025",
+    "category_id": "software-stack",
+    "title": "开发工具",
+    "description": "调试器、性能分析器、代码优化工具",
+    "status": "future",
+    "sort_order": 5
+  },
+
+  // 业务场景应用分类的知识项
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440026",
+    "category_id": "business-scenarios",
+    "title": "标准模式",
+    "description": "适合日常拍摄，支持自动优化参数，平衡画质与性能",
+    "status": "completed",
+    "sort_order": 0
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440027",
+    "category_id": "business-scenarios",
+    "title": "肖像模式",
+    "description": "利用计算摄影技术实现自然景深效果，突出主体，适合人像拍摄",
+    "status": "completed",
+    "sort_order": 1
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440028",
+    "category_id": "business-scenarios",
+    "title": "夜间模式",
+    "description": "在低光环境下自动激活，通过长时间曝光和智能处理捕捉更多细节",
+    "status": "completed",
+    "sort_order": 2
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440029",
+    "category_id": "business-scenarios",
+    "title": "全景模式",
+    "description": "移动手机拼接拍摄，适合拍摄广阔场景，支持360度全景",
+    "status": "completed",
+    "sort_order": 3
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440030",
+    "category_id": "business-scenarios",
+    "title": "延时摄影",
+    "description": "压缩快播视频，呈现时间流逝效果，如记录日落或云朵移动",
+    "status": "completed",
+    "sort_order": 4
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440031",
+    "category_id": "business-scenarios",
+    "title": "慢动作",
+    "description": "将视频放慢播放，突出细节，适合拍摄运动或水流",
+    "status": "completed",
+    "sort_order": 5
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440032",
+    "category_id": "business-scenarios",
+    "title": "电影效果",
+    "description": "模拟电影拍摄风格，提供专业级视频录制体验",
+    "status": "completed",
+    "sort_order": 6
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440033",
+    "category_id": "business-scenarios",
+    "title": "RAW格式拍摄",
+    "description": "保留更多图像信息，方便后期处理，适合专业摄影",
+    "status": "completed",
+    "sort_order": 7
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440034",
+    "category_id": "business-scenarios",
+    "title": "曝光调整",
+    "description": "通过滑动屏幕调整照片亮度，实时预览效果",
+    "status": "completed",
+    "sort_order": 8
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440035",
+    "category_id": "business-scenarios",
+    "title": "对焦锁定",
+    "description": "长按对焦框锁定焦点，适合拍摄移动物体",
+    "status": "completed",
+    "sort_order": 9
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440036",
+    "category_id": "business-scenarios",
+    "title": "风格滤镜",
+    "description": "提供多种滤镜效果，如黑白、复古等，为照片增添艺术气息",
+    "status": "completed",
+    "sort_order": 10
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440037",
+    "category_id": "business-scenarios",
+    "title": "HDR模式",
+    "description": "高动态范围拍摄，自动融合多帧不同曝光图像",
+    "status": "completed",
+    "sort_order": 11
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440038",
+    "category_id": "business-scenarios",
+    "title": "专业模式",
+    "description": "手动调节ISO、快门速度、白平衡等参数，满足专业需求",
+    "status": "completed",
+    "sort_order": 12
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440039",
+    "category_id": "business-scenarios",
+    "title": "AI场景识别",
+    "description": "智能识别拍摄场景，自动优化参数设置",
+    "status": "future",
+    "sort_order": 13
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440040",
+    "category_id": "business-scenarios",
+    "title": "AR滤镜",
+    "description": "增强现实滤镜效果，实时叠加虚拟元素",
+    "status": "future",
+    "sort_order": 14
+  }
+]
+```
+
+#### 4. 知识项详情表 (knowledge_details)
+```sql
+CREATE TABLE knowledge_details (
+    id VARCHAR(36) PRIMARY KEY,
+    knowledge_id VARCHAR(36) NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    external_link VARCHAR(500),
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (knowledge_id) REFERENCES knowledge_items(id)
+);
+```
+
+其中，knowledge_id是外键（knowledge_items表的id），表示当前详情项归属哪个知识项。
+初始化数据如下(createTime和updateTime随便填一下就行)：
+```json
+[
+  // 光学系统详情
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440001-001",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440001",
+    "title": "镜头组",
+    "description": "由多个透镜组成的光学系统，用于聚焦光线到传感器上",
+    "external_link": "https://en.wikipedia.org/wiki/Camera_lens",
+    "sort_order": 0
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440001-002",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440001",
+    "title": "光圈控制",
+    "description": "调节进光量和景深，影响图像的亮度和背景虚化效果",
+    "external_link": "https://en.wikipedia.org/wiki/Aperture",
+    "sort_order": 1
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440001-003",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440001",
+    "title": "焦距调节",
+    "description": "改变镜头与传感器的距离，实现远近景物的清晰成像",
+    "external_link": "https://en.wikipedia.org/wiki/Focal_length",
+    "sort_order": 2
+  },
+
+  // 感光元件详情
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440002-001",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440002",
+    "title": "CMOS传感器",
+    "description": "互补金属氧化物半导体传感器，功耗低、集成度高",
+    "external_link": "https://en.wikipedia.org/wiki/CMOS_sensor",
+    "sort_order": 0
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440002-002",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440002",
+    "title": "CCD传感器",
+    "description": "电荷耦合器件传感器，画质好但功耗较高",
+    "external_link": "https://en.wikipedia.org/wiki/Charge-coupled_device",
+    "sort_order": 1
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440002-003",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440002",
+    "title": "像素结构",
+    "description": "光电二极管、传输门、读出电路等组成的像素单元",
+    "external_link": "https://en.wikipedia.org/wiki/Pixel",
+    "sort_order": 2
+  },
+
+  // 光电转换详情
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440003-001",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440003",
+    "title": "光子吸收",
+    "description": "光子撞击半导体材料，激发电子-空穴对",
+    "external_link": "https://en.wikipedia.org/wiki/Photoelectric_effect",
+    "sort_order": 0
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440003-002",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440003",
+    "title": "电荷积累",
+    "description": "在像素单元中积累电荷，形成电压信号",
+    "external_link": "https://en.wikipedia.org/wiki/Charge_accumulation",
+    "sort_order": 1
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440003-003",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440003",
+    "title": "信号读出",
+    "description": "将积累的电荷转换为数字信号输出",
+    "external_link": "https://en.wikipedia.org/wiki/Analog-to-digital_converter",
+    "sort_order": 2
+  },
+
+  // 去马赛克详情
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440007-001",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440007",
+    "title": "双线性插值",
+    "description": "简单的色彩插值算法，计算速度快但质量一般",
+    "external_link": "https://en.wikipedia.org/wiki/Bilinear_interpolation",
+    "sort_order": 0
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440007-002",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440007",
+    "title": "边缘自适应",
+    "description": "根据边缘信息调整插值方向，提高图像质量",
+    "external_link": "https://en.wikipedia.org/wiki/Edge-preserving_smoothing",
+    "sort_order": 1
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440007-003",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440007",
+    "title": "频率域方法",
+    "description": "在频率域进行色彩重建，质量较高但计算复杂",
+    "external_link": "https://en.wikipedia.org/wiki/Frequency_domain",
+    "sort_order": 2
+  },
+
+  // 白平衡详情
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440008-001",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440008",
+    "title": "灰度世界法",
+    "description": "假设图像的平均色彩为灰色，调整RGB通道比例",
+    "external_link": "https://en.wikipedia.org/wiki/Gray_world_assumption",
+    "sort_order": 0
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440008-002",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440008",
+    "title": "完美反射法",
+    "description": "假设图像中最亮的像素为白色，进行白平衡校正",
+    "external_link": "https://en.wikipedia.org/wiki/White_balance",
+    "sort_order": 1
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440008-003",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440008",
+    "title": "色温调节",
+    "description": "根据光源色温调整白平衡参数",
+    "external_link": "https://en.wikipedia.org/wiki/Color_temperature",
+    "sort_order": 2
+  },
+
+  // 降噪算法详情
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440009-001",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440009",
+    "title": "双边滤波",
+    "description": "保持边缘的同时平滑噪声，效果较好",
+    "external_link": "https://en.wikipedia.org/wiki/Bilateral_filter",
+    "sort_order": 0
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440009-002",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440009",
+    "title": "非局部均值",
+    "description": "利用图像的非局部相似性进行降噪",
+    "external_link": "https://en.wikipedia.org/wiki/Non-local_means",
+    "sort_order": 1
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440009-003",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440009",
+    "title": "小波降噪",
+    "description": "在小波域进行噪声抑制，保持细节",
+    "external_link": "https://en.wikipedia.org/wiki/Wavelet",
+    "sort_order": 2
+  },
+
+  // 标准模式详情
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440026-001",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440026",
+    "title": "自动曝光",
+    "description": "根据环境光线自动调整曝光参数",
+    "external_link": "https://en.wikipedia.org/wiki/Automatic_exposure",
+    "sort_order": 0
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440026-002",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440026",
+    "title": "自动对焦",
+    "description": "自动检测并聚焦到主体",
+    "external_link": "https://en.wikipedia.org/wiki/Autofocus",
+    "sort_order": 1
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440026-003",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440026",
+    "title": "场景优化",
+    "description": "智能识别场景并优化拍摄参数",
+    "external_link": "https://en.wikipedia.org/wiki/Scene_mode",
+    "sort_order": 2
+  },
+
+  // 肖像模式详情
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440027-001",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440027",
+    "title": "景深效果",
+    "description": "模拟大光圈浅景深效果",
+    "external_link": "https://en.wikipedia.org/wiki/Depth_of_field",
+    "sort_order": 0
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440027-002",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440027",
+    "title": "主体识别",
+    "description": "AI识别人物主体并分离背景",
+    "external_link": "https://en.wikipedia.org/wiki/Image_segmentation",
+    "sort_order": 1
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440027-003",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440027",
+    "title": "边缘优化",
+    "description": "优化主体边缘，避免不自然效果",
+    "external_link": "https://en.wikipedia.org/wiki/Edge_detection",
+    "sort_order": 2
+  },
+
+  // 夜间模式详情
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440028-001",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440028",
+    "title": "多帧合成",
+    "description": "多张照片合成提高亮度和细节",
+    "external_link": "https://en.wikipedia.org/wiki/Image_stacking",
+    "sort_order": 0
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440028-002",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440028",
+    "title": "降噪算法",
+    "description": "专门的低光降噪处理",
+    "external_link": "https://en.wikipedia.org/wiki/Noise_reduction",
+    "sort_order": 1
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440028-003",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440028",
+    "title": "智能曝光",
+    "description": "根据场景自动调整曝光时间",
+    "external_link": "https://en.wikipedia.org/wiki/Exposure_(photography)",
+    "sort_order": 2
+  },
+
+  // 全景模式详情
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440029-001",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440029",
+    "title": "图像拼接",
+    "description": "多张照片无缝拼接成全景图",
+    "external_link": "https://en.wikipedia.org/wiki/Image_stitching",
+    "sort_order": 0
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440029-002",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440029",
+    "title": "运动检测",
+    "description": "检测手机移动轨迹指导拍摄",
+    "external_link": "https://en.wikipedia.org/wiki/Motion_detection",
+    "sort_order": 1
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440029-003",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440029",
+    "title": "畸变校正",
+    "description": "校正广角镜头产生的畸变",
+    "external_link": "https://en.wikipedia.org/wiki/Lens_distortion",
+    "sort_order": 2
+  },
+
+  // 延时摄影详情
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440030-001",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440030",
+    "title": "时间压缩",
+    "description": "将长时间过程压缩为短视频",
+    "external_link": "https://en.wikipedia.org/wiki/Time-lapse_photography",
+    "sort_order": 0
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440030-002",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440030",
+    "title": "帧率控制",
+    "description": "控制拍摄间隔和播放速度",
+    "external_link": "https://en.wikipedia.org/wiki/Frame_rate",
+    "sort_order": 1
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440030-003",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440030",
+    "title": "稳定性处理",
+    "description": "减少手持拍摄的抖动",
+    "external_link": "https://en.wikipedia.org/wiki/Image_stabilization",
+    "sort_order": 2
+  },
+
+  // 慢动作详情
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440031-001",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440031",
+    "title": "高速拍摄",
+    "description": "高帧率拍摄捕捉快速动作",
+    "external_link": "https://en.wikipedia.org/wiki/High_speed_photography",
+    "sort_order": 0
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440031-002",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440031",
+    "title": "慢放效果",
+    "description": "降低播放速度突出细节",
+    "external_link": "https://en.wikipedia.org/wiki/Slow_motion",
+    "sort_order": 1
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440031-003",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440031",
+    "title": "运动分析",
+    "description": "分析运动轨迹和速度",
+    "external_link": "https://en.wikipedia.org/wiki/Motion_analysis",
+    "sort_order": 2
+  },
+
+  // 电影效果详情
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440032-001",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440032",
+    "title": "宽屏比例",
+    "description": "21:9等电影宽屏比例",
+    "external_link": "https://en.wikipedia.org/wiki/Aspect_ratio_(image)",
+    "sort_order": 0
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440032-002",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440032",
+    "title": "电影色彩",
+    "description": "模拟电影胶片的色彩风格",
+    "external_link": "https://en.wikipedia.org/wiki/Color_grading",
+    "sort_order": 1
+  },
+  {
+    "id": "detail-550e8400-e29b-41d4-a716-446655440032-003",
+    "knowledge_id": "550e8400-e29b-41d4-a716-446655440032",
+    "title": "景深控制",
+    "description": "精确控制景深效果",
+    "external_link": "https://en.wikipedia.org/wiki/Depth_of_field",
+    "sort_order": 2
+  }
+]
+```
+
+
+
+
+#### 5. 聊天记录表 (chat_history)
+```sql
+CREATE TABLE chat_history (
+    id VARCHAR(36) PRIMARY KEY,
+    user_id VARCHAR(36),
+    session_id VARCHAR(100) NOT NULL,
+    message_type VARCHAR(20) NOT NULL,        -- 'user' | 'assistant'
+    content TEXT NOT NULL,
+    response_time_ms INTEGER,                 -- 响应时间
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+```
+
+### 索引设计
+
+```sql
+-- 知识分类索引
+CREATE INDEX idx_knowledge_categories_active ON knowledge_categories(is_active);
+CREATE INDEX idx_knowledge_categories_sort ON knowledge_categories(sort_order);
+CREATE INDEX idx_knowledge_categories_category_id ON knowledge_categories(category_id);
+
+-- 知识项索引
+CREATE INDEX idx_knowledge_items_category ON knowledge_items(category_id);
+CREATE INDEX idx_knowledge_items_status ON knowledge_items(status);
+CREATE INDEX idx_knowledge_items_sort ON knowledge_items(sort_order);
+
+-- 知识项详情索引
+CREATE INDEX idx_knowledge_details_knowledge ON knowledge_details(knowledge_id);
+CREATE INDEX idx_knowledge_details_sort ON knowledge_details(sort_order);
+
+-- 聊天记录索引
+CREATE INDEX idx_chat_history_session ON chat_history(session_id);
+CREATE INDEX idx_chat_history_user ON chat_history(user_id);
+CREATE INDEX idx_chat_history_created ON chat_history(created_at);
+```
+
+### 表关系说明
+
+1. **knowledge_categories** 表：
+   - `id`: 主键，VARCHAR(36)
+
+2. **knowledge_items** 表：
+   - `id`: 主键，VARCHAR(36)
+   - `category_id`: 外键，关联 knowledge_categories.id
+
+3. **knowledge_details** 表：
+   - `id`: 主键，VARCHAR(36)
+   - `knowledge_id`: 外键，关联 knowledge_items.id
+
+4. **users** 表：
+   - `id`: 主键，VARCHAR(36)
+
+5. **chat_history** 表：
+   - `id`: 主键，VARCHAR(36)
+   - `user_id`: 外键，关联 users.id
+
+### 数据完整性说明
+
+- 所有表都使用VARCHAR(36)作为主键，便于生成UUID
+- 外键关系确保数据一致性
+- 索引优化查询性能
+- 时间戳字段自动维护创建和更新时间

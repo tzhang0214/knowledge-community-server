@@ -7,7 +7,7 @@ import uuid
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.database import init_db, SessionLocal
-from src.models import User, KnowledgeCategory, KnowledgeItem
+from src.models import User, KnowledgeCategory, KnowledgeItem, KnowledgeDetail
 from src.auth import get_password_hash
 
 
@@ -21,6 +21,12 @@ def create_sample_data():
     db = SessionLocal()
     
     try:
+        # 检查是否已存在数据
+        existing_user = db.query(User).first()
+        if existing_user:
+            print("数据库中已存在数据，跳过示例数据创建")
+            return
+        
         # 创建管理员用户
         admin_user = User(
             id="ADMIN001",
@@ -132,7 +138,112 @@ def create_sample_data():
         for item in knowledge_items:
             db.add(item)
         
-        # FlowModule、FlowVersion、FlowArchitecture已删除，不再创建相关数据
+        # 提交知识项数据
+        db.commit()
+        
+        # 创建知识项详情
+        knowledge_details = [
+            # ISP基础概念的详情
+            KnowledgeDetail(
+                id=f"detail-{knowledge_items[0].id}-001",
+                knowledge_id=knowledge_items[0].id,
+                title="ISP定义",
+                description="图像信号处理器(Image Signal Processor)的定义和作用",
+                external_link="https://en.wikipedia.org/wiki/Image_signal_processor",
+                sort_order=1
+            ),
+            KnowledgeDetail(
+                id=f"detail-{knowledge_items[0].id}-002",
+                knowledge_id=knowledge_items[0].id,
+                title="ISP功能",
+                description="ISP的主要功能包括去马赛克、降噪、色彩校正等",
+                external_link="https://www.sony-semicon.com/en/products/isp/",
+                sort_order=2
+            ),
+            
+            # 光学系统的详情
+            KnowledgeDetail(
+                id=f"detail-{knowledge_items[1].id}-001",
+                knowledge_id=knowledge_items[1].id,
+                title="镜头组",
+                description="由多个透镜组成的光学系统，用于聚焦光线到传感器上",
+                external_link="https://en.wikipedia.org/wiki/Camera_lens",
+                sort_order=1
+            ),
+            KnowledgeDetail(
+                id=f"detail-{knowledge_items[1].id}-002",
+                knowledge_id=knowledge_items[1].id,
+                title="光圈",
+                description="控制光线进入量的机械装置，影响景深和曝光",
+                external_link="https://en.wikipedia.org/wiki/Aperture",
+                sort_order=2
+            ),
+            KnowledgeDetail(
+                id=f"detail-{knowledge_items[1].id}-003",
+                knowledge_id=knowledge_items[1].id,
+                title="焦距",
+                description="镜头到成像平面的距离，决定视角和放大倍数",
+                external_link="https://en.wikipedia.org/wiki/Focal_length",
+                sort_order=3
+            ),
+            
+            # 去马赛克的详情
+            KnowledgeDetail(
+                id=f"detail-{knowledge_items[2].id}-001",
+                knowledge_id=knowledge_items[2].id,
+                title="Bayer阵列",
+                description="RGB颜色滤镜阵列，每个像素只记录一种颜色信息",
+                external_link="https://en.wikipedia.org/wiki/Bayer_filter",
+                sort_order=1
+            ),
+            KnowledgeDetail(
+                id=f"detail-{knowledge_items[2].id}-002",
+                knowledge_id=knowledge_items[2].id,
+                title="Demosaic算法",
+                description="从Bayer阵列重建全彩图像的算法",
+                external_link="https://en.wikipedia.org/wiki/Demosaicing",
+                sort_order=2
+            ),
+            
+            # 降噪算法的详情
+            KnowledgeDetail(
+                id=f"detail-{knowledge_items[3].id}-001",
+                knowledge_id=knowledge_items[3].id,
+                title="空间域降噪",
+                description="在空间域内进行噪声抑制的算法",
+                external_link="https://en.wikipedia.org/wiki/Noise_reduction",
+                sort_order=1
+            ),
+            KnowledgeDetail(
+                id=f"detail-{knowledge_items[3].id}-002",
+                knowledge_id=knowledge_items[3].id,
+                title="频域降噪",
+                description="在频域内进行噪声抑制的算法",
+                external_link="https://en.wikipedia.org/wiki/Frequency_domain",
+                sort_order=2
+            ),
+            
+            # ISP芯片设计的详情
+            KnowledgeDetail(
+                id=f"detail-{knowledge_items[4].id}-001",
+                knowledge_id=knowledge_items[4].id,
+                title="硬件架构",
+                description="ISP芯片的硬件架构设计考虑",
+                external_link="https://www.qualcomm.com/products/integrated-circuits/computer-vision",
+                sort_order=1
+            ),
+            KnowledgeDetail(
+                id=f"detail-{knowledge_items[4].id}-002",
+                knowledge_id=knowledge_items[4].id,
+                title="性能优化",
+                description="ISP芯片性能优化的方法和策略",
+                external_link="https://www.intel.com/content/www/us/en/products/network-io/programmable/ethernet.html",
+                sort_order=2
+            )
+        ]
+        
+        for detail in knowledge_details:
+            db.add(detail)
         
         # 提交所有更改
         db.commit()
